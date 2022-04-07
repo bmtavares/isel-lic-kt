@@ -2,6 +2,8 @@ import isel.leic.UsbPort
 import isel.leic.utils.*
 
 fun main(args: Array<String>) {
+    //test
+
     var value = 1
     var multiplier = 1
     while(true) {
