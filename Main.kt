@@ -1,9 +1,16 @@
 import isel.leic.UsbPort
 import isel.leic.utils.*
 
-fun main(args: Array<String>) {
-    //test
+const val DEBUG_MODE = true
 
+fun main(args: Array<String>) {
+    val ticketDispenser = TicketDispenser()
+
+    ticketDispenser.main()
+
+    }
+
+fun testFPGA() {
     var value = 1
     var multiplier = 1
     while(true) {
