@@ -7,7 +7,7 @@ class HAL {
 
     fun setBits(mask: Int) = UsbPort.write(UsbPort.read() or mask)
 
-    fun clrBits(mask: Int) = UsbPort.write(UsbPort.read() xor mask)
+    fun clrBits(mask: Int) = UsbPort.write(UsbPort.read() and mask.inv())
 
     fun writeBits(mask: Int, value: Int) = UsbPort.write((UsbPort.read() and mask.inv()) or (mask and value))
 }
