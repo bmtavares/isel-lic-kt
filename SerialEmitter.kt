@@ -5,21 +5,20 @@ enum class Destination {
 
 class SerialEmitter {
     companion object {
-        const val writeMask = 0b0000_0111
-        const val readMask = 0b0000_1000
+        const val WRITE_MASK = (HAL.SCLK_MASK or HAL.SS_MASK) or HAL.SDX_MASK
+        /** Established size of a data frame containing TnL, RoundTrip bit, Destiny ID and Origin ID. */
+        const val PROTOCOL_SIZE = 10
     }
 
-    var hal = HAL()
+    private var hal = HAL()
 
     fun init() {
-        if(!DEBUG_MODE)
-            // Make sure the output is empty
-            hal.clrBits(0b1111_1111)
+        // Make sure the output is empty
+        hal.init()
     }
 
     /**
      * Prepares the given [data] vector to be sent to the destination [addr].
-     * If [DEBUG_MODE] is on, the [HAL] will not be used.
      */
     fun send(addr: Destination, data: Int) {
         init()
@@ -31,36 +30,32 @@ class SerialEmitter {
         }
 
         // This is currently not working for LCD for the obvious reason that the highest bit _isn't_ the TnL
-        val size = data.takeHighestOneBit().countTrailingZeroBits()
+        // val size = data.takeHighestOneBit().countTrailingZeroBits()
+        // Taking from the protocol specification, we set the size according to a constant
+        val size = PROTOCOL_SIZE
 
-        if(DEBUG_MODE){
-            println("Full data is ${data.toString(2)}")
-            println("Parity is ${data.findParity().toInt()}")
-        }
-
-        var sdx = (data ushr size) and HAL.SDX_MASK
+        var sdx = (data ushr size - 1) and HAL.SDX_MASK
         // frameBlock will contain the 3 bits we will use to send data via the [HAL]
         // 0b[SS][SCLK][SDX]
         var frameBlock : Int
         var parity = 0b0 xor sdx
 
         // Wait for busy signal to end in case it is happening before new transmission
-        if(!DEBUG_MODE)
-            while(isBusy()){ }
+        while(isBusy()){ }
 
         // Send full data vector (with TnL)
-        for(i in 1..size + 1){
+        for(i in 1..size){
             // Clock low
             frameBlock = sdx
 
             // Write to USB
-            writeToUSB(frameBlock)
+            hal.writeBits(WRITE_MASK, frameBlock)
 
             // Clock high
             frameBlock = frameBlock xor HAL.SCLK_MASK
 
             // Write to USB
-            writeToUSB(frameBlock)
+            hal.writeBits(WRITE_MASK, frameBlock)
 
             // Get next sdx
             sdx = (data ushr (size - i))
@@ -76,33 +71,37 @@ class SerialEmitter {
         frameBlock = parity
 
         // Write to USB
-        writeToUSB(frameBlock)
+        hal.writeBits(WRITE_MASK, frameBlock)
 
         // Send on high & set ss to low
         frameBlock = frameBlock xor (HAL.SS_MASK or HAL.SCLK_MASK)
 
         // Write to USB
-        writeToUSB(frameBlock)
+        hal.writeBits(WRITE_MASK, frameBlock)
 
         // Wait for busy signal to end
-        if(!DEBUG_MODE)
-            while(isBusy()){ }
+        while(isBusy()){ }
     }
 
-    /**
-     * Writes to USB on the Class' [writeMask].
-     * If [DEBUG_MODE] is on, writes the [message] to console instead.
-     */
-    private fun writeToUSB(message : Int) =
-        if(DEBUG_MODE)
-            println(message.toString(2))
-        else{
-            hal.writeBits(writeMask, message)
-//            Thread.sleep(1000)
-        }
+    /** Reports the busy status of the IOS. */
+    fun isBusy(): Boolean = hal.isBit(HAL.BUSY_BIT)
 
-    /**
-     * Reports the busy status of the IOS.
-     */
-    fun isBusy(): Boolean = hal.isBit(readMask)
+    fun unitTest(){
+        println("Starting SerialEmitter test in 5s.")
+        println("If busy bit is set (0b${HAL.BUSY_BIT.toString(2)}) the emission will be frozen until it is set to low.")
+
+        // Make sure the UsbPort simulator is open before
+        hal.readBits(0xFF)
+        Thread.sleep(5000)
+
+        println("Destination ID 0xE")
+        println("Origin ID 0xA")
+        println("Round trip is true")
+        println("Sending to Ticket Dispenser")
+
+        val destination = Destination.TICKET_DISPENSER
+        val data = 0b1_1110_1010
+
+        send(destination, data)
+    }
 }
