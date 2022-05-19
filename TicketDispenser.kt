@@ -1,18 +1,17 @@
-class TicketDispenser {
+import SerialEmitter
 
-    private var serialEmitter = SerialEmitter()
-
-//    fun init(){
-//
-//    }
-
+class TicketDispenser (_serialEmitter: SerialEmitter){
+private var serialEmitter : SerialEmitter = _serialEmitter
     fun main() {
-        print(0x1, 0xC, false)
-        print(0xE, 0xA, true)
-        print(0x3, 0x6, true)
-        print(0xB, 0x2, false)
-        print(0x4, 0xB, false)
-        print(0x9, 0x6, true)
+       // print(0x1, 0xC, false)
+       // print(0xE, 0xA, true)
+       // print(0x3, 0x6, true)
+       // print(0xB, 0x2, false)
+       // print(0x4, 0xB, false)
+       // print(0x9, 0x6, true)
+
+
+
     }
 
     /** Constructs a frame containing the data required for printing a ticket

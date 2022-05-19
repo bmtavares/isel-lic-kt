@@ -4,26 +4,36 @@ import isel.leic.utils.*
 /** If this constant is set, the program will try to run all possible tests.
  *  Best used with UsbPort simulator. */
 const val TEST_MODE = false
-
+private var serialEmitter = SerialEmitter()
 fun main(args: Array<String>) {
+
         if(TEST_MODE)
+
             runTests()
         else {
-            val ticketDispenser = TicketDispenser()
-            ticketDispenser.main()
+           // val ticketDispenser = TicketDispenser(serialEmitter)
+            val lcd = LCD(serialEmitter)
+            lcd.init()
+            print("_yessss___")
+            print("_yessss___")
+
+            //ticketDispenser.main()
+
+
+
         }
     }
 
 fun runTests() {
-    val ticketDispenser = TicketDispenser()
-    val serialEmitter = SerialEmitter()
-    val hal = HAL()
+  // val ticketDispenser = TicketDispenser()
+  // val serialEmitter = SerialEmitter()
+  // val hal = HAL()
 
-    hal.unitTest()
-    serialEmitter.unitTest()
-    ticketDispenser.unitTest()
+  // hal.unitTest()
+  // serialEmitter.unitTest()
+  // ticketDispenser.unitTest()
 
-    println("Tests finished. Close the UsbPort Simulator to stop.")
+  // println("Tests finished. Close the UsbPort Simulator to stop.")
 }
 
 /** Sets the LEDs on a back and forth pattern at a variable speed by using the switches.

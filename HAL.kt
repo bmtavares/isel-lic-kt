@@ -25,7 +25,12 @@ class HAL {
      *
      *  result = 0b0000_0010
      * */
-    fun readBits(mask: Int): Int = UsbPort.read() and mask
+    fun readBits(mask: Int): Int{
+        var Inat: Int = UsbPort.read() and mask
+        Inat = UsbPort.read() and mask
+        Inat = UsbPort.read() and mask
+        return Inat
+    }
 
     /** Read the [UsbPort] at the position given by the [mask] and check if it's set to high.
      *  [mask] **must** only contain one bit.

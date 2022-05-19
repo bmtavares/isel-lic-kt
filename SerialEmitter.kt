@@ -1,3 +1,5 @@
+import isel.leic.UsbPort
+
 enum class Destination {
     LCD,
     TICKET_DISPENSER
@@ -21,8 +23,9 @@ class SerialEmitter {
      * Prepares the given [data] vector to be sent to the destination [addr].
      */
     fun send(addr: Destination, data: Int) {
-        init()
-
+       // init()
+        print("going to send   ")
+        println(data.toString(2))
         // Set TnL
         val data = when(addr) {
             Destination.LCD -> data or 0b00_0000_0000
@@ -38,32 +41,36 @@ class SerialEmitter {
         // frameBlock will contain the 3 bits we will use to send data via the [HAL]
         // 0b[SS][SCLK][SDX]
         var frameBlock : Int
-        var parity = 0b0 xor sdx
-
+        var parity = 0b0
+        Thread.sleep(1000, 100)
         // Wait for busy signal to end in case it is happening before new transmission
         while(isBusy()){ }
 
         // Send full data vector (with TnL)
         for(i in 1..size){
             // Clock low
-            frameBlock = sdx
-
+          //  frameBlock = sdx
+            sdx = (data ushr size - i) and HAL.SDX_MASK
+            parity = parity xor sdx
             // Write to USB
-            hal.writeBits(WRITE_MASK, frameBlock)
-
+            hal.writeBits(HAL.SCLK_MASK, 0)
+            hal.writeBits(HAL.SS_MASK, 0)
+            hal.writeBits(HAL.SDX_MASK, sdx)
+            Thread.sleep(1, 100)
             // Clock high
-            frameBlock = frameBlock xor HAL.SCLK_MASK
+        //    frameBlock = frameBlock xor HAL.SCLK_MASK
+            hal.writeBits(HAL.SCLK_MASK, 255)
+            Thread.sleep(1, 100)
 
             // Write to USB
-            hal.writeBits(WRITE_MASK, frameBlock)
+            //hal.writeBits(WRITE_MASK, frameBlock)
+           // UsbPort.write()
 
             // Get next sdx
-            sdx = (data ushr (size - i))
-            // Mask for first bit
-            sdx = sdx and HAL.SDX_MASK
 
+            println(sdx)
             // Calculate parity
-            parity = parity xor sdx
+
         }
 
         // Time for parity
@@ -71,14 +78,18 @@ class SerialEmitter {
         frameBlock = parity
 
         // Write to USB
-        hal.writeBits(WRITE_MASK, frameBlock)
+        hal.writeBits(HAL.SCLK_MASK, 0)
+        Thread.sleep(1, 100)
+        hal.writeBits(HAL.SDX_MASK, parity)
 
-        // Send on high & set ss to low
-        frameBlock = frameBlock xor (HAL.SS_MASK or HAL.SCLK_MASK)
-
-        // Write to USB
-        hal.writeBits(WRITE_MASK, frameBlock)
-
+        // Clock high
+        //    frameBlock = frameBlock xor HAL.SCLK_MASK
+        hal.writeBits(HAL.SCLK_MASK, 255)
+        hal.writeBits(HAL.SS_MASK, 255)
+        Thread.sleep(1, 100)
+        hal.writeBits(HAL.SCLK_MASK, 0)
+        Thread.sleep(1, 100)
+        println(parity)
         // Wait for busy signal to end
         while(isBusy()){ }
     }
