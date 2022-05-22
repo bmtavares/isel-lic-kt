@@ -48,48 +48,28 @@ class SerialEmitter {
 
         // Send full data vector (with TnL)
         for(i in 1..size){
-            // Clock low
-          //  frameBlock = sdx
+
             sdx = (data ushr size - i) and HAL.SDX_MASK
-            parity = parity xor sdx
-            // Write to USB
-            hal.writeBits(HAL.SCLK_MASK, 0)
+            parity = parity xor sdx // Calculate parity
+
+            hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
             hal.writeBits(HAL.SS_MASK, 0)
             hal.writeBits(HAL.SDX_MASK, sdx)
             Thread.sleep(1, 100)
-            // Clock high
-        //    frameBlock = frameBlock xor HAL.SCLK_MASK
-            hal.writeBits(HAL.SCLK_MASK, 255)
+            hal.writeBits(HAL.SCLK_MASK, 255)    // Clock high
             Thread.sleep(1, 100)
-
-            // Write to USB
-            //hal.writeBits(WRITE_MASK, frameBlock)
-           // UsbPort.write()
-
-            // Get next sdx
-
-            println(sdx)
-            // Calculate parity
 
         }
 
-        // Time for parity
-        // Set on low
-        frameBlock = parity
-
-        // Write to USB
-        hal.writeBits(HAL.SCLK_MASK, 0)
+        hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
         Thread.sleep(1, 100)
         hal.writeBits(HAL.SDX_MASK, parity)
-
-        // Clock high
-        //    frameBlock = frameBlock xor HAL.SCLK_MASK
-        hal.writeBits(HAL.SCLK_MASK, 255)
+        hal.writeBits(HAL.SCLK_MASK, 255)  // Clock high
         hal.writeBits(HAL.SS_MASK, 255)
         Thread.sleep(1, 100)
         hal.writeBits(HAL.SCLK_MASK, 0)
         Thread.sleep(1, 100)
-        println(parity)
+
         // Wait for busy signal to end
         while(isBusy()){ }
     }

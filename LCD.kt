@@ -94,7 +94,7 @@ class LCD(_serialEmitter: SerialEmitter){
         Thread.sleep(1000, 100)
         //fim de init
 
-        serialEmitter.send(Destination.LCD,dataa_creator(false,0b0001_0100))
+        serialEmitter.send(Destination.LCD,dataa_creator(false,0b0001_0100))  //
         Thread.sleep(1000, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(true,0b0100_0001)) // escrita A
         Thread.sleep(1000, 100)
