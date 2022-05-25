@@ -15,6 +15,8 @@ fun main(args: Array<String>) {
             val lcd = LCD(serialEmitter)
             lcd.init()
             print("_yessss___")
+            lcd.teste()
+
             print("_yessss___")
 
             //ticketDispenser.main()
