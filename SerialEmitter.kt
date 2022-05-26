@@ -83,7 +83,7 @@ class SerialEmitter {
 
         // Make sure the UsbPort simulator is open before
         hal.readBits(0xFF)
-        Thread.sleep(5000)
+        Thread.sleep(100)
 
         println("Destination ID 0xE")
         println("Origin ID 0xA")
