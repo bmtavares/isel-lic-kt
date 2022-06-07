@@ -109,8 +109,10 @@ class LCD(_serialEmitter: SerialEmitter){
         var i = 0
         for (element in text) {
             write(element)
+            Thread.sleep(10, 100)
             if (i >= 15){
                 serialEmitter.send(Destination.LCD,dataa_creator(false,0b0001_1000)) //
+                Thread.sleep(10, 100)
             }
             i++
         }
@@ -125,11 +127,31 @@ class LCD(_serialEmitter: SerialEmitter){
 
 
     fun teste() {
+        write("TesteOK abcdefghijk1")
+        clear()
+        write("TesteOK abcdefghijk2")
+        clear()
 
-        write("TesteOK yuiuytruytrhj")
+        write("TesteOK abcdefghijk3")
+        clear()
+        write("TesteOK abcdefghijk4")
 
-
-
+        clear()
+        write("TesteOK abcdefghijk5")
+        clear()
+        write("TesteOK abcdefghijk6")
+        clear()
+        write("TesteOK abcdefghijk7")
+        clear()
+        write("TesteOK abcdefghijk8")
+        clear()
+        write("TesteOK abcdefghijk9")
+        clear()
+        write("TesteOK abcdefghijk10")
+        clear()
+        write("TesteOK abcdefghijk11")
+        clear()
+        write("TesteOK abcdefghijk12")
 
     }
 
@@ -145,6 +167,7 @@ class LCD(_serialEmitter: SerialEmitter){
 
     fun clear() {
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0000_0001))
+        Thread.sleep(10, 100)
     }
 
 }

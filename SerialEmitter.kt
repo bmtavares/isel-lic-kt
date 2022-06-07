@@ -53,22 +53,25 @@ class SerialEmitter {
             parity = parity xor sdx // Calculate parity
 
             hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
+            Thread.sleep(1, 100)
             hal.writeBits(HAL.SS_MASK, 0)
+            Thread.sleep(1, 100)
+
             hal.writeBits(HAL.SDX_MASK, sdx)
-            Thread.sleep(1, 100)
+            Thread.sleep(2, 100)
             hal.writeBits(HAL.SCLK_MASK, 255)    // Clock high
-            Thread.sleep(1, 100)
+            Thread.sleep(2, 100)
 
         }
 
         hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
-        Thread.sleep(1, 100)
+        Thread.sleep(2, 100)
         hal.writeBits(HAL.SDX_MASK, parity)
         hal.writeBits(HAL.SCLK_MASK, 255)  // Clock high
         hal.writeBits(HAL.SS_MASK, 255)
-        Thread.sleep(1, 100)
+        Thread.sleep(2, 100)
         hal.writeBits(HAL.SCLK_MASK, 0)
-        Thread.sleep(1, 100)
+        Thread.sleep(3, 100)
 
         // Wait for busy signal to end
         while(isBusy()){ }
