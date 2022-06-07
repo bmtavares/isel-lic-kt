@@ -18,13 +18,14 @@ class KeyReceiver(private val hal:HAL) {
             if(i == 0) {
                 if(read == 0) {
                     println("Start bit was ${read.toString(2)}!")
+                    flushRemoveBuffer()
                     return 0b10000
                 }
             }
             else if(i == 5) {
                 if (read == 1) {
                     println("End bit was ${read.toString(2)}!")
-
+                    flushRemoveBuffer()
                     return 0b10000
                 }
             }
@@ -35,5 +36,12 @@ class KeyReceiver(private val hal:HAL) {
         hal.setBits(TCLK_MASK)
         hal.clrBits(TCLK_MASK)
         return keyPressed
+    }
+
+    private fun flushRemoveBuffer(){
+        for(i in 0..6){
+            hal.setBits(TCLK_MASK)
+            hal.clrBits(TCLK_MASK)
+        }
     }
 }
