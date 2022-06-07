@@ -5,14 +5,12 @@ enum class Destination {
     TICKET_DISPENSER
 }
 
-class SerialEmitter {
+class SerialEmitter(private val hal: HAL) {
     companion object {
         const val WRITE_MASK = (HAL.SCLK_MASK or HAL.SS_MASK) or HAL.SDX_MASK
         /** Established size of a data frame containing TnL, RoundTrip bit, Destiny ID and Origin ID. */
         const val PROTOCOL_SIZE = 10
     }
-
-    private var hal = HAL()
 
     fun init() {
         // Make sure the output is empty
@@ -42,7 +40,7 @@ class SerialEmitter {
         // 0b[SS][SCLK][SDX]
         var frameBlock : Int
         var parity = 0b0
-        Thread.sleep(1000, 100)
+//        Thread.sleep(1000, 100)
         // Wait for busy signal to end in case it is happening before new transmission
         while(isBusy()){ }
 
@@ -55,20 +53,20 @@ class SerialEmitter {
             hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
             hal.writeBits(HAL.SS_MASK, 0)
             hal.writeBits(HAL.SDX_MASK, sdx)
-            Thread.sleep(1, 100)
+//            Thread.sleep(1000, 100)
             hal.writeBits(HAL.SCLK_MASK, 255)    // Clock high
-            Thread.sleep(1, 100)
+//            Thread.sleep(1000, 100)
 
         }
 
         hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
-        Thread.sleep(1, 100)
+//        Thread.sleep(1, 100)
         hal.writeBits(HAL.SDX_MASK, parity)
         hal.writeBits(HAL.SCLK_MASK, 255)  // Clock high
         hal.writeBits(HAL.SS_MASK, 255)
-        Thread.sleep(1, 100)
+//        Thread.sleep(1000, 100)
         hal.writeBits(HAL.SCLK_MASK, 0)
-        Thread.sleep(1, 100)
+//        Thread.sleep(1000, 100)
 
         // Wait for busy signal to end
         while(isBusy()){ }
