@@ -72,20 +72,20 @@ class LCD(_serialEmitter: SerialEmitter){
     fun init() {
        // serialEmitter.send(Destination.TICKET_DISPENSER,0b1110)
 
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0011_0000))  //Function set
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0011_0000))   //Function set
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0011_0000))   //Function set
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
 //n = 1 F = 0
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0011_1000))
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0000_1000))   //Display off
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0000_0001))   //Display clear
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0000_0111))   //Entry mode set testado na aula
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0000_0110))  //Sets cursor move direction   A0 = 0 = no shift ??
         //and specifies display shift.
@@ -95,9 +95,9 @@ class LCD(_serialEmitter: SerialEmitter){
 
 
 
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         serialEmitter.send(Destination.LCD,dataa_creator(false,0b0000_1111))   //Display on/off control
-//        Thread.sleep(100, 100)
+        Thread.sleep(100, 100)
         //fim de init
 
 

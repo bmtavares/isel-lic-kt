@@ -17,6 +17,7 @@ fun main(args: Array<String>) {
         else {
             val lcd = LCD(serialEmitter)
             lcd.init()
+            //runLCDTest()
             lcd.clear()
             lcd.write("LCD initted")
             while(true){
@@ -40,13 +41,10 @@ fun runLCDTest() {
     val lcd = LCD(serialEmitter)
     lcd.init()
     print("_yessss___")
-    for(i in 0..100){
+    for(i in 0..15){
+        lcd.write("TESTING LIC abcdefghij$i")
         lcd.clear()
-        lcd.teste()
     }
-    lcd.clear()
-    lcd.write("Test finished")
-    print("_yessss___")
 
     //ticketDispenser.main()
 }

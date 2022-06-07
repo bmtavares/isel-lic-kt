@@ -53,20 +53,20 @@ class SerialEmitter(private val hal: HAL) {
             hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
             hal.writeBits(HAL.SS_MASK, 0)
             hal.writeBits(HAL.SDX_MASK, sdx)
-//            Thread.sleep(1000, 100)
+            Thread.sleep(50, 100)
             hal.writeBits(HAL.SCLK_MASK, 255)    // Clock high
-//            Thread.sleep(1000, 100)
+            Thread.sleep(50, 100)
 
         }
 
         hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
-//        Thread.sleep(1, 100)
+        Thread.sleep(100, 100)
         hal.writeBits(HAL.SDX_MASK, parity)
         hal.writeBits(HAL.SCLK_MASK, 255)  // Clock high
         hal.writeBits(HAL.SS_MASK, 255)
-//        Thread.sleep(1000, 100)
+        Thread.sleep(100, 100)
         hal.writeBits(HAL.SCLK_MASK, 0)
-//        Thread.sleep(1000, 100)
+        Thread.sleep(10, 100)
 
         // Wait for busy signal to end
         while(isBusy()){ }

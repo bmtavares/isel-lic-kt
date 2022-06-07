@@ -24,6 +24,7 @@ class KeyReceiver(private val hal:HAL) {
             else if(i == 5) {
                 if (read == 1) {
                     println("End bit was ${read.toString(2)}!")
+
                     return 0b10000
                 }
             }
