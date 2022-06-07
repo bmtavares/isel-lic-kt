@@ -2,10 +2,11 @@ import isel.leic.UsbPort
 
 class HAL {
     companion object{
-        const val SS_MASK = 0b0000_0100
-        const val SCLK_MASK = 0b0000_0010
+        const val SS_MASK = 0b0000_1000
+        const val SCLK_MASK = 0b0000_0100
         const val SDX_MASK = 0b0000_0001
-        const val BUSY_BIT = 0b0000_1000
+//        const val BUSY_BIT = 0b0000_1000
+        const val BUSY_BIT = 0b0100_0000
     }
 
     private val initialOutput = 0b0000_0000
