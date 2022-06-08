@@ -14,7 +14,7 @@ class SerialEmitter(private val hal: HAL) {
 
     fun init() {
         // Make sure the output is empty
-        hal.init()
+        //hal.init()
     }
 
     /**

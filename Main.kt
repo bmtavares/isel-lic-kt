@@ -16,14 +16,25 @@ fun main(args: Array<String>) {
             //runTests()
         else {
             val lcd = LCD(serialEmitter)
-            lcd.init()
+            //lcd.init()
             //runLCDTest()
-            lcd.clear()
-            lcd.write("LCD initted")
+           // lcd.clear()
+           // lcd.write("LCD initted")
+            var Inat: Int = UsbPort.read()
             while(true){
-                val keyCode = kbd.getKey()
-                if (keyCode != NONE)
-                    println(keyCode)
+                //val keyCode = kbd.getKey()
+                //if (keyCode != NONE)
+                 //   println(keyCode)
+                Inat = UsbPort.read()
+                if(Inat and 0b0000_1000 >= 1 ){
+                    println(Inat)
+                    UsbPort.write(0b0010_0000)
+
+                    Inat = UsbPort.read()
+                    UsbPort.write(0b0000_0000)
+                }
+
+
             }
         }
     }
