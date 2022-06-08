@@ -7,6 +7,14 @@ class HAL {
         const val SDX_MASK = 0b0000_0001
 //        const val BUSY_BIT = 0b0000_1000
         const val BUSY_BIT = 0b0100_0000
+
+        const val COIN_MASK = 0b0000_1000
+        const val COIN_VALUE_MASK = 0b0000_0111
+
+
+        const val COIN_ACCEPT_MASK = 0b0010_0000
+        const val COIN_COLLECT_MASK = 0b0100_0000
+        const val COIN_EJECT_MASK = 0b1000_0000
     }
 
     private val initialOutput = 0b0000_0000

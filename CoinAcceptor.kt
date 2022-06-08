@@ -7,14 +7,14 @@ class CoinAcceptor(private val hal: HAL) {
     }
 
     fun hasCoin(): Boolean {
-        var Inat: Int = UsbPort.read()
-        return Inat and 0b0000_1000 != 0
+        var Inat: Int = hal.readBits(HAL.COIN_MASK)
+        return Inat != 0
     }
 
     fun getCoinValue(): Int {
         val arr = arrayOf<Int>(5, 10, 20,50,100,200)
-        var Inat: Int = UsbPort.read()
-        Inat = Inat and 0b0000_0111
+        var Inat: Int = hal.readBits(HAL.COIN_VALUE_MASK)
+
         //if 110 or 111 error
         return arr[Inat]
     }
@@ -24,12 +24,12 @@ class CoinAcceptor(private val hal: HAL) {
             print("error")
             return
         }
-        hal.setBits(0b0010_0000)
+        hal.setBits(HAL.COIN_ACCEPT_MASK)
 
         while (hasCoin()){
 
         }
-        hal.clrBits(0b0010_0000)
+        hal.clrBits(HAL.COIN_ACCEPT_MASK)
     }
 
     fun ejectCoins() {
@@ -37,14 +37,14 @@ class CoinAcceptor(private val hal: HAL) {
             print("error")
             return
         }
-        hal.setBits(0b1000_0000)
+        hal.setBits(HAL.COIN_EJECT_MASK)
         Thread.sleep(2000)
-        hal.clrBits(0b1000_0000)
+        hal.clrBits(HAL.COIN_EJECT_MASK)
     }
 
     fun collectCoins() {
-        hal.setBits(0b0100_0000)
+        hal.setBits(HAL.COIN_COLLECT_MASK)
         Thread.sleep(2000)
-        hal.clrBits(0b0100_0000)
+        hal.clrBits(HAL.COIN_COLLECT_MASK)
     }
 }

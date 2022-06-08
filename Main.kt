@@ -16,10 +16,13 @@ fun main(args: Array<String>) {
             //runTests()
         else {
             val lcd = LCD(serialEmitter)
-            //lcd.init()
+            lcd.init()
             //runLCDTest()
-           // lcd.clear()
-           // lcd.write("LCD initted")
+            lcd.clear()
+            lcd.write("LCD ")
+            lcd.jump_line()
+            lcd.write("abcdefghijjjjjjjjjjjjjjjjjjjjjj ")
+
             var Inat: Int = UsbPort.read()
             while(true){
                 //val keyCode = kbd.getKey()

@@ -104,6 +104,10 @@ class LCD(_serialEmitter: SerialEmitter){
 
     }
 
+    fun jump_line(){
+        setDDRAGM(65)
+    }
+
     fun write(text: String) {
         //serialEmitter.send(Destination.LCD, 32)
         var i = 0
