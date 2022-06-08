@@ -1,3 +1,5 @@
+import isel.leic.utils.Time
+
 const val NONE = 0.toChar();
 
 class KBD(private val hal:HAL) {
@@ -17,14 +19,6 @@ class KBD(private val hal:HAL) {
     )
 
     private val keyReceiver = KeyReceiver(hal)
-
-    fun init() {
-        TODO()
-    }
-
-    private fun getKeyParallel(): Char {
-        TODO()
-    }
     
     private fun getKeySerial(): Char =
         if(!hal.isBit(KeyReceiver.TXD_MASK))
@@ -35,6 +29,11 @@ class KBD(private val hal:HAL) {
     fun getKey(): Char = getKeySerial()
     
     fun waitKey(timeout: Long): Char {
-        TODO()
+        val start = Time.getTimeInMillis()
+        while(Time.getTimeInMillis() < start + timeout){
+            val key = getKeySerial()
+            if(key != NONE) return key
+        }
+        return NONE
     }
 }
