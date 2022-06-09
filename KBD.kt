@@ -21,7 +21,7 @@ class KBD(private val hal:HAL) {
     private val keyReceiver = KeyReceiver(hal)
     
     private fun getKeySerial(): Char =
-        if(!hal.isBit(KeyReceiver.TXD_MASK))
+        if(keyReceiver.pollKey())
             keyMap.getOrDefault(keyReceiver.rcv(), NONE)
         else
             NONE

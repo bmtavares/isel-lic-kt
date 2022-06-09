@@ -1,20 +1,15 @@
 class KeyReceiver(private val hal:HAL) {
     companion object{
-        const val TXD_MASK = 0b0010_0000
-        const val TCLK_MASK = 0b0001_0000
-    }
 
-    fun init() {
-        TODO()
     }
 
     fun rcv(): Int {
         var keyPressed=0b0
 
         for(i in 0..5){
-            hal.setBits(TCLK_MASK)
-            val read = if (hal.isBit(TXD_MASK)) 1 else 0
-            hal.clrBits(TCLK_MASK)
+            hal.setBits(HAL.TCLK_MASK)
+            val read = if (hal.isBit(HAL.TXD_MASK)) 1 else 0
+            hal.clrBits(HAL.TCLK_MASK)
             if(i == 0) {
                 if(read == 0) {
                     println("Start bit was ${read.toString(2)}!")
@@ -33,15 +28,17 @@ class KeyReceiver(private val hal:HAL) {
                 keyPressed = (keyPressed or (read shl i - 1))
             }
         }
-        hal.setBits(TCLK_MASK)
-        hal.clrBits(TCLK_MASK)
+        hal.setBits(HAL.TCLK_MASK)
+        hal.clrBits(HAL.TCLK_MASK)
         return keyPressed
     }
 
+    fun pollKey(): Boolean = !hal.isBit(HAL.TXD_MASK)
+
     private fun flushRemoveBuffer(){
         for(i in 0..6){
-            hal.setBits(TCLK_MASK)
-            hal.clrBits(TCLK_MASK)
+            hal.setBits(HAL.TCLK_MASK)
+            hal.clrBits(HAL.TCLK_MASK)
         }
     }
 }
