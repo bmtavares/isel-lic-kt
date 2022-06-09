@@ -14,21 +14,21 @@ class LCD(private val serialEmitter: SerialEmitter){
     private fun writeData(data: Int) = writeByte(true,data)
 
     fun init() {
-        Thread.sleep(100)
+        Thread.sleep(15) //Wait for more than 15 ms
         writeCMD(0b0011_0000)   //Function set
-        Thread.sleep(100)
+        Thread.sleep(5) //Wait for more than 4.1 ms
         writeCMD(0b0011_0000)   //Function set
-        Thread.sleep(100)
+        Thread.sleep(0,110)  //Wait for more than 100 µs
         writeCMD(0b0011_0000)   //Function set
         Thread.sleep(100)
 
         //n = 1 F = 0
         writeCMD(0b0011_1000)
-        Thread.sleep(100)
+        Thread.sleep(0,3)
         writeCMD(0b0000_1000)   //Display off
-        Thread.sleep(100)
+        Thread.sleep(0,3)
         clear()                       //Display clear
-        Thread.sleep(100)
+        Thread.sleep(0,3)
         writeCMD(0b0000_0111)   //Entry mode set testado na aula
         writeCMD(0b0000_0110)   //Sets cursor move direction   A0 = 0 = no shift ??
                                       //and specifies display shift.
@@ -52,7 +52,7 @@ class LCD(private val serialEmitter: SerialEmitter){
         }
     }
 
-    fun write(c: Char) = writeData(c.code)
+    fun write(c: Char) = writeData(c.toInt())
 
     fun cursor(line: Int, column: Int) {
         val lineStart = LINE_2_ADDR * (line - 1)

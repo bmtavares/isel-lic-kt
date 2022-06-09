@@ -15,6 +15,10 @@ fun main(args: Array<String>) {
             //testFPGA()
             runTests()
         else {
+
+
+
+
 //            var Inat: Int = UsbPort.read()
 //            while(true) {
 //                val keyCode = kbd.getKey()
@@ -36,10 +40,12 @@ fun main(args: Array<String>) {
     }
 
 fun runTests() {
+    lcd.unitTest()
     hal.unitTest()
+
     serialEmitter.unitTest()
     ticketDispenser.unitTest()
-    lcd.unitTest()
+
     kbd.unitTest()
 
     println("Tests finished. Close the UsbPort Simulator to stop.")
