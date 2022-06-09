@@ -20,8 +20,8 @@ private var serialEmitter : SerialEmitter = _serialEmitter
         // 0bRt_DDDD_OOOO
         var data  = 0b0
         data = data or (roundTrip.toInt() shl 8)
-        data = data or (destinyId shl 4)
-        data = data or originId
+        data = data or (destinyId.flip(4) shl 4)
+        data = data or originId.flip(4)
 
         serialEmitter.send(Destination.TICKET_DISPENSER, data)
     }

@@ -3,64 +3,46 @@ import isel.leic.utils.*
 
 /** If this constant is set, the program will try to run all possible tests.
  *  Best used with UsbPort simulator. */
-const val TEST_MODE = false
+const val TEST_MODE = true
 private val hal = HAL()
 private val serialEmitter = SerialEmitter(hal)
 private val kbd = KBD(hal)
 private val ticketDispenser = TicketDispenser(serialEmitter)
+private val lcd = LCD(serialEmitter)
 
 fun main(args: Array<String>) {
         if(TEST_MODE)
-            testFPGA()
-            //runLCDTest()
-            //runTests()
+            //testFPGA()
+            runTests()
         else {
-            val lcd = LCD(serialEmitter)
-            lcd.init()
-            //runLCDTest()
-            lcd.clear()
-            lcd.write("LCD ")
-            lcd.jump_line()
-            lcd.write("abcdefghijjjjjjjjjjjjjjjjjjjjjj ")
-
-            var Inat: Int = UsbPort.read()
-            while(true){
-                //val keyCode = kbd.getKey()
-                //if (keyCode != NONE)
-                 //   println(keyCode)
-                Inat = UsbPort.read()
-                if(Inat and 0b0000_1000 >= 1 ){
-                    println(Inat)
-                    UsbPort.write(0b0010_0000)
-
-                    Inat = UsbPort.read()
-                    UsbPort.write(0b0000_0000)
-                }
-
-
-            }
+//            var Inat: Int = UsbPort.read()
+//            while(true) {
+//                val keyCode = kbd.getKey()
+//                if (keyCode != NONE)
+//                    println(keyCode)
+//                //val keyCode = kbd.getKey()
+//                //if (keyCode != NONE)
+//                //   println(keyCode)
+//                Inat = UsbPort.read()
+//                if (Inat and 0b0000_1000 >= 1) {
+//                    println(Inat)
+//                    UsbPort.write(0b0010_0000)
+//
+//                    Inat = UsbPort.read()
+//                    UsbPort.write(0b0000_0000)
+//                }
+//            }
         }
     }
 
 fun runTests() {
-    //hal.unitTest()
-    //serialEmitter.unitTest()
+    hal.unitTest()
+    serialEmitter.unitTest()
     ticketDispenser.unitTest()
+    lcd.unitTest()
+    kbd.unitTest()
 
     println("Tests finished. Close the UsbPort Simulator to stop.")
-}
-
-fun runLCDTest() {
-    // val ticketDispenser = TicketDispenser(serialEmitter)
-    val lcd = LCD(serialEmitter)
-    lcd.init()
-    print("_yessss___")
-    for(i in 0..15){
-        lcd.write("TESTING LIC abcdefghij$i")
-        lcd.clear()
-    }
-
-    //ticketDispenser.main()
 }
 
 /** Sets the LEDs on a back and forth pattern at a variable speed by using the switches.

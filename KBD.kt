@@ -31,9 +31,23 @@ class KBD(private val hal:HAL) {
     fun waitKey(timeout: Long): Char {
         val start = Time.getTimeInMillis()
         while(Time.getTimeInMillis() < start + timeout){
-            val key = getKeySerial()
+            val key = getKey()
             if(key != NONE) return key
         }
         return NONE
+    }
+
+    fun unitTest() {
+        println("Starting KBD test")
+        println("Waiting 5s for key")
+        var key = waitKey(5000)
+        println(if(key != NONE) key else "No key pressed")
+        println("Waiting 3s for key")
+        key = waitKey(3000)
+        println(if(key != NONE) key else "No key pressed")
+        println("Waiting 1s for key")
+        key = waitKey(1000)
+        println(if(key != NONE) key else "No key pressed")
+        println("KBD test finished")
     }
 }
