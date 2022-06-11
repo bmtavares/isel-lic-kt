@@ -18,6 +18,14 @@ class KBD(private val hal:HAL) {
         0b1011 to '#'
     )
 
+    fun loopTest(){
+        while(true){
+            val key = getKey()
+            if (key != NONE) println(key)
+        }
+    }
+
+
     private val keyReceiver = KeyReceiver(hal)
     
     private fun getKeySerial(): Char =
