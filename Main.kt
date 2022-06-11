@@ -9,6 +9,8 @@ private val serialEmitter = SerialEmitter(hal)
 private val kbd = KBD(hal)
 private val ticketDispenser = TicketDispenser(serialEmitter)
 private val lcd = LCD(serialEmitter)
+private val coinAcceptor = CoinAcceptor(hal)
+
 
 fun main(args: Array<String>) {
         if(TEST_MODE)
@@ -16,37 +18,36 @@ fun main(args: Array<String>) {
             runTests()
         else {
 
+            while (true){
+               if(coinAcceptor.hasCoin()) {
+                   println("hascoin")
+                   var c_v : Int = coinAcceptor.getCoinValue();
+                   if((c_v == 50) or (c_v == 100)){
+                       coinAcceptor.acceptCoin()
+                   }
+                   if(c_v == 200){
+                       println(coinAcceptor.arr_stored_coins[4])
+                       coinAcceptor.acceptCoin()
+                       coinAcceptor.collectCoins()
+                       println(coinAcceptor.arr_inserted_coins[4])
+                       println(coinAcceptor.arr_stored_coins[4])
+                   }
+
+               }
+            }
 
 
-
-//            var Inat: Int = UsbPort.read()
-//            while(true) {
-//                val keyCode = kbd.getKey()
-//                if (keyCode != NONE)
-//                    println(keyCode)
-//                //val keyCode = kbd.getKey()
-//                //if (keyCode != NONE)
-//                //   println(keyCode)
-//                Inat = UsbPort.read()
-//                if (Inat and 0b0000_1000 >= 1) {
-//                    println(Inat)
-//                    UsbPort.write(0b0010_0000)
-//
-//                    Inat = UsbPort.read()
-//                    UsbPort.write(0b0000_0000)
-//                }
-//            }
         }
     }
 
 fun runTests() {
-    lcd.unitTest()
-    hal.unitTest()
+  //  lcd.unitTest()
+  //  hal.unitTest()
+//
+  //  serialEmitter.unitTest()
+  //  ticketDispenser.unitTest()
 
-    serialEmitter.unitTest()
-    ticketDispenser.unitTest()
-
-    kbd.unitTest()
+    kbd.loopTest()
 
     println("Tests finished. Close the UsbPort Simulator to stop.")
 }
