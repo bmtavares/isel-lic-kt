@@ -84,18 +84,49 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
               // NONE -> return
                '*' -> alternateSelectionMode()
                '#' -> goToPaymentScreen()
-               else -> inputSelection(k)
+              // else -> inputSelection(k)
+               else -> selectionMode(k)
            }
        }
    }
 
+    private fun selectionMode(k:Char){
+        if(usingArrows){
+            return inputSelectionUsingArrows(k)
+        }
+
+        return inputSelection(k)
+    }
+
+
+    private  fun inputSelectionUsingArrows(k:Char){
+        var newSelect = selection
+        if(k == '2'){
+            newSelect +=1
+        }else if (k == '8'){
+            newSelect -=1
+
+        }
+        var station = listOfStations.getOrNull(newSelect)
+        lcd.write(station!!.name)
+        lcd.jumpLine()
+        lcd.write(newSelect.toString())
+
+        lcd.setDDRAGM(76)
+        lcd.write(lcd.priceToText(station!!.price!!))
+        lcd.setDDRAGM(66)
+        lcd.write("<>")
+
+        selection = newSelect
+
+
+    }
+
    private fun inputSelection(k:Char) {
+
        lcd.clear()
-
-       var newSelect = (selection * 10 + (k.toInt()-48)) % 100
-
+       var newSelect = (selection * 10 + (k.toInt()-48)) % 100  // char to digit only implemented on kotlin 15
        var station = listOfStations.getOrNull(newSelect)
-
        if(station == null){
            newSelect = (k.toInt()-48)
            station = listOfStations.getOrNull(newSelect)
