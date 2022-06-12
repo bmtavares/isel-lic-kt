@@ -1,8 +1,4 @@
 class KeyReceiver(private val hal:HAL) {
-    companion object{
-
-    }
-
     fun rcv(): Int {
         var keyPressed=0b0
 

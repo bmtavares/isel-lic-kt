@@ -1,5 +1,3 @@
-import isel.leic.UsbPort
-
 enum class Destination {
     LCD,
     TICKET_DISPENSER
@@ -7,66 +5,63 @@ enum class Destination {
 
 class SerialEmitter(private val hal: HAL) {
     companion object {
-        const val WRITE_MASK = (HAL.SCLK_MASK or HAL.SS_MASK) or HAL.SDX_MASK
         /** Established size of a data frame containing TnL, RoundTrip bit, Destiny ID and Origin ID. */
         const val PROTOCOL_SIZE = 10
     }
 
-    fun init() {
-        // Make sure the output is empty
-        //hal.init()
-    }
 
     /**
      * Prepares the given [data] vector to be sent to the destination [addr].
      */
     fun send(addr: Destination, data: Int) {
-       // init()
         print("going to send   ")
         println(data.toString(2))
+
         // Set TnL
         val data = when(addr) {
             Destination.LCD -> data or 0b00_0000_0000
             Destination.TICKET_DISPENSER -> data or 0b10_0000_0000
         }
 
-        // This is currently not working for LCD for the obvious reason that the highest bit _isn't_ the TnL
-        // val size = data.takeHighestOneBit().countTrailingZeroBits()
-        // Taking from the protocol specification, we set the size according to a constant
-        val size = PROTOCOL_SIZE
-
-        var sdx = (data ushr size - 1) and HAL.SDX_MASK
-        // frameBlock will contain the 3 bits we will use to send data via the [HAL]
-        // 0b[SS][SCLK][SDX]
-        var frameBlock : Int
+        var sdx : Int
         var parity = 0b0
-//        Thread.sleep(1000, 100)
+
         // Wait for busy signal to end in case it is happening before new transmission
         while(isBusy()){ }
 
         // Send full data vector (with TnL)
-        for(i in 1..size){
+        for(i in 1..PROTOCOL_SIZE){
 
-            sdx = (data ushr size - i) and HAL.SDX_MASK
+            sdx = (data ushr PROTOCOL_SIZE - i) and 0b1
             parity = parity xor sdx // Calculate parity
 
-            hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
-            hal.writeBits(HAL.SS_MASK, 0)
-            hal.writeBits(HAL.SDX_MASK, sdx)
-          //  Thread.sleep(0, 100)
-            hal.writeBits(HAL.SCLK_MASK, 255)    // Clock high
-           // Thread.sleep(50, 100)
+            // Set clock low
+            hal.clrBits(HAL.SCLK_MASK)
 
+            // Set nSS
+            hal.clrBits(HAL.SS_MASK)
+
+            // Write the SDX bit
+            if(sdx > 0) hal.setBits(HAL.SDX_MASK) else hal.clrBits(HAL.SDX_MASK)
+
+            // Set clock high
+            hal.setBits(HAL.SCLK_MASK)
         }
 
-        hal.writeBits(HAL.SCLK_MASK, 0)   // Clock low
-    //    Thread.sleep(100, 100)
-        hal.writeBits(HAL.SDX_MASK, parity)
-        hal.writeBits(HAL.SCLK_MASK, 255)  // Clock high
-        hal.writeBits(HAL.SS_MASK, 255)
-     //   Thread.sleep(100, 100)
-        hal.writeBits(HAL.SCLK_MASK, 0)
-    //    Thread.sleep(10, 100)
+        // Set clock low
+        hal.clrBits(HAL.SCLK_MASK)
+
+        // Write parity to SDX bit
+        if(parity > 0) hal.setBits(HAL.SDX_MASK) else hal.clrBits(HAL.SDX_MASK)
+
+        // Set clock to high
+        hal.setBits(HAL.SCLK_MASK)
+
+        // Clear nSS
+        hal.setBits(HAL.SS_MASK)
+
+        // Set clock to low
+        hal.clrBits(HAL.SCLK_MASK)
 
         // Wait for busy signal to end
         while(isBusy()){ }

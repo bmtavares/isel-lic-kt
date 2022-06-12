@@ -14,21 +14,14 @@ class LCD(private val serialEmitter: SerialEmitter){
     private fun writeData(data: Int) = writeByte(true,data)
 
     fun init() {
-        Thread.sleep(15) //Wait for more than 15 ms
         writeCMD(0b0011_0000)   //Function set
-        Thread.sleep(5) //Wait for more than 4.1 ms
         writeCMD(0b0011_0000)   //Function set
-        Thread.sleep(0,110)  //Wait for more than 100 µs
         writeCMD(0b0011_0000)   //Function set
-        Thread.sleep(100)
 
         //n = 1 F = 0
         writeCMD(0b0011_1000)
-        Thread.sleep(0,3)
         writeCMD(0b0000_1000)   //Display off
-        Thread.sleep(0,3)
-        clear()                       //Display clear
-        Thread.sleep(0,3)
+        clear()                 //Display clear
         writeCMD(0b0000_0111)   //Entry mode set testado na aula
         writeCMD(0b0000_0110)   //Sets cursor move direction   A0 = 0 = no shift ??
                                       //and specifies display shift.
@@ -36,9 +29,7 @@ class LCD(private val serialEmitter: SerialEmitter){
                                       //performed during data write
                                       //and read.
 
-        Thread.sleep(100)
         writeCMD(0b0000_1111)   //Display on/off control
-        Thread.sleep(100)
     }
 
     fun write(text: String) {
@@ -68,7 +59,7 @@ class LCD(private val serialEmitter: SerialEmitter){
         for(i in 0..15){
             if (i % 2 == 1) cursor(2,1)
             write("TESTING LIC $i")
-            Thread.sleep(1000)
+            Thread.sleep(500) //Simulator is too fast to test without a sleep
             if (i % 2 == 1) clear()
         }
         write("TestFinish!")
