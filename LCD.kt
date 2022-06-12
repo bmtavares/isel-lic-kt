@@ -53,6 +53,26 @@ class LCD(private val serialEmitter: SerialEmitter){
 
     fun clear() = writeCMD(0b0000_0001)
 
+    fun priceToText(i: Int):String{
+        var unidades = 0
+        var cent = 0
+        cent = i % 100
+        unidades = (i - cent)/100
+
+        val s = "$unidades.$cent$"
+        return s
+    }
+
+    fun jumpLine(){
+        setDDRAGM(65)
+    }
+
+    fun setDDRAGM(i: Int){
+        //i must be 0 .. 127
+        var il : Int = i + 127
+        writeCMD(il)
+    }
+
     fun unitTest() {
         init()
         print("Starting LCD test")

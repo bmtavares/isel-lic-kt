@@ -14,9 +14,6 @@ class SerialEmitter(private val hal: HAL) {
      * Prepares the given [data] vector to be sent to the destination [addr].
      */
     fun send(addr: Destination, data: Int) {
-        print("going to send   ")
-        println(data.toString(2))
-
         // Set TnL
         val data = when(addr) {
             Destination.LCD -> data or 0b00_0000_0000

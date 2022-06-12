@@ -3,7 +3,7 @@ import isel.leic.utils.*
 
 /** If this constant is set, the program will try to run all possible tests.
  *  Best used with UsbPort simulator. */
-const val TEST_MODE = true
+const val TEST_MODE = false
 private val hal = HAL()
 private val serialEmitter = SerialEmitter(hal)
 private val kbd = KBD(hal)
@@ -12,29 +12,19 @@ private val lcd = LCD(serialEmitter)
 private val coinAcceptor = CoinAcceptor(hal)
 
 
+
 fun main(args: Array<String>) {
         if(TEST_MODE)
             //testFPGA()
             runTests()
         else {
+            lcd.init()
 
-            while (true){
-               if(coinAcceptor.hasCoin()) {
-                   println("hascoin")
-                   var c_v : Int = coinAcceptor.getCoinValue();
-                   if((c_v == 50) or (c_v == 100)){
-                       coinAcceptor.acceptCoin()
-                   }
-                   if(c_v == 200){
-                       println(coinAcceptor.arr_stored_coins[4])
-                       coinAcceptor.acceptCoin()
-                       coinAcceptor.collectCoins()
-                       println(coinAcceptor.arr_inserted_coins[4])
-                       println(coinAcceptor.arr_stored_coins[4])
-                   }
+            val m = Maintenance(hal);
+            val tui = TUI(lcd,m,kbd,coinAcceptor);
 
-               }
-            }
+            tui.waitingScreen()
+
 
 
         }

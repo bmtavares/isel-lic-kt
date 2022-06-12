@@ -12,6 +12,12 @@ class CoinAcceptor(private val hal: HAL) {
         Thread.sleep(1000)
     }
 
+    fun getCurrentValueIn( arr : Array<Int>): Int{
+        // pode não fazer sentido basta  -->  arr.sum()
+        return arr.sum()
+    }
+
+
     fun hasCoin(): Boolean {
         var Inat: Int = hal.readBits(HAL.COIN_MASK)
 
