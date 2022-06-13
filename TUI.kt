@@ -1,4 +1,6 @@
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.system.exitProcess
 
 const val TIMEOUT_FOR_SELECTION = 12000L
@@ -40,13 +42,15 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
    }
 
    fun waitingScreen(){
-
+       val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
        while(true){
            finish = false
            lcd.clear()
            lcd.write(" Ticket to Ride ")
            lcd.jumpLine()
-           lcd.write("place holder date ")
+
+           var currentDate = sdf.format(Date())
+           lcd.write(currentDate.toString())
            while (!finish){
                if (m.isMaintenanceKey()){
                    goToMaintenanceMenu()
@@ -55,6 +59,14 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
                    initStationSelection()
                    goToStationSelection()
                }
+               val newcurrentDate = sdf.format(Date())
+               if(newcurrentDate != currentDate ){
+                   lcd.jumpLine()
+                   lcd.write(newcurrentDate.toString())
+                   currentDate = newcurrentDate
+               }
+
+
            }
 
        }
