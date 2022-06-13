@@ -112,7 +112,6 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
 
     private  fun inputSelectionUsingArrows(k:Char){
-        lcd.clear()
         var newSelect = selection
         if(k == '2'){
             newSelect +=1
@@ -125,38 +124,35 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
                 newSelect = listOfStations.size-1
             }
         }
-
-
         var station = listOfStations.getOrNull(newSelect)
+        dispaySelection(station,newSelect)
+    }
+
+    private fun dispaySelection(station:Station?,newSelect:Int){
+        lcd.clear()
         lcd.write(station!!.name)
         lcd.jumpLine()
         if(newSelect<10) lcd.write('0')
         lcd.write(newSelect.toString())
-        lcd.write("<>")
+        if(usingArrows){
+            lcd.writeData(126)
+            lcd.writeData(127)
+        }
+
+        // lcd.write("<>")
         lcd.setDDRAGM(76)
         lcd.write(lcd.priceToText(station!!.price!!))
+        if(!usingArrows){
+            lcd.setDDRAGM(66)
+        }
 
         selection = newSelect
-
-
     }
 
     private  fun inputSelectionUsingArrows(i :Int){
-        lcd.clear()
-
-
-
 
         var station = listOfStations.getOrNull(i)
-        lcd.write(station!!.name)
-        lcd.jumpLine()
-        if(i<10) lcd.write('0')
-        lcd.write(i.toString())
-        lcd.write("<>")
-        lcd.setDDRAGM(76)
-        lcd.write(lcd.priceToText(station!!.price!!))
-
-        selection = i
+        dispaySelection(station,i)
 
 
     }
@@ -164,25 +160,15 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
 
     private fun inputSelection(i:Int) {
-        lcd.clear()
+
 
         var station = listOfStations.getOrNull(i)
 
-        lcd.write(station!!.name)
-        lcd.jumpLine()
-        if(i<10) lcd.write('0')
-        lcd.write(i.toString())
-
-        lcd.setDDRAGM(76)
-        lcd.write(lcd.priceToText(station!!.price!!))
-        lcd.setDDRAGM(66)
-
-
-        selection = i
+        dispaySelection(station,i)
     }
 
    private fun inputSelection(k:Char) {
-       lcd.clear()
+
        var newSelect = (selection * 10 + (k.toInt()-48)) % 100  // char to digit only implemented on kotlin 15
        var station = listOfStations.getOrNull(newSelect)
        if(station == null){
@@ -190,17 +176,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
            station = listOfStations.getOrNull(newSelect)
            if(station == null) newSelect = selection
        }
-           lcd.write(station!!.name)
-           lcd.jumpLine()
-           if(newSelect<10) lcd.write('0')
-           lcd.write(newSelect.toString())
-
-           lcd.setDDRAGM(76)
-           lcd.write(lcd.priceToText(station!!.price!!))
-           lcd.setDDRAGM(66)
-
-
-       selection = newSelect
+       dispaySelection(station,newSelect)
    }
 
     private fun refreshPaymentScreen(StationName:String,price: Int){
@@ -208,6 +184,11 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
         lcd.write(StationName)
         lcd.jumpLine()
         lcd.write(lcd.priceToText(price))
+        lcd.writeData(126)
+        if(returnTrip){
+            lcd.writeData(127)
+        }
+
     }
 
    private fun goToPaymentScreen() {
@@ -232,15 +213,22 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
                finish = true
 
            }
-/*
+
            val key = kbd.getKey()
            if (key == '0'){
                alternateTripReturn()
+               if(returnTrip){
+                   price *=2
+               }else{
+                   price /=2
+               }
+               refreshPaymentScreen(station.name,price - coinacpt.totalCoinsInserted)
+
            }
            if (key == '#'){
                goToAbort()
            }
-*/
+
        }
 
    }

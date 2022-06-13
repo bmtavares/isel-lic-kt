@@ -11,7 +11,7 @@ class LCD(private val serialEmitter: SerialEmitter){
 
     private fun writeCMD(data: Int) = writeByte(false,data)
 
-    private fun writeData(data: Int) = writeByte(true,data)
+     fun writeData(data: Int) = writeByte(true,data)
 
     fun init() {
         writeCMD(0b0011_0000)   //Function set
@@ -68,6 +68,8 @@ class LCD(private val serialEmitter: SerialEmitter){
     fun jumpLine(){
         setDDRAGM(65)
     }
+
+
 
     fun setDDRAGM(i: Int){
         //i must be 0 .. 127
