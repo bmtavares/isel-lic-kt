@@ -21,8 +21,7 @@ fun main(args: Array<String>) {
             lcd.init()
 
             val m = Maintenance(hal);
-            val tui = TUI(lcd,m,kbd,coinAcceptor);
-
+            val tui = TUI(lcd,m,kbd,coinAcceptor,ticketDispenser);
             tui.waitingScreen()
 
 

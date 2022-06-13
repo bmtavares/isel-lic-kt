@@ -6,16 +6,13 @@ class CoinAcceptor(private val hal: HAL) {
     public  var arr_inserted_coins = arrayOf<Int>(0, 0, 0,0,0,0);
     public  var stored_coins : Int = 0;
     public  var arr_stored_coins = arrayOf<Int>(0, 0, 0,0,0,0);
+    public  var totalCoinsInserted = 0
 
     fun init() {
         hal.clrBits(0b1110_0000)
         Thread.sleep(1000)
     }
 
-    fun getCurrentValueIn( arr : Array<Int>): Int{
-        // pode não fazer sentido basta  -->  arr.sum()
-        return arr.sum()
-    }
 
 
     fun hasCoin(): Boolean {
@@ -45,7 +42,7 @@ class CoinAcceptor(private val hal: HAL) {
         }
 
         arr_inserted_coins[getCoinIndex()] +=1;
-
+        totalCoinsInserted += getCoinValue()
         hal.setBits(HAL.COIN_ACCEPT_MASK)
 
         while (hasCoin()){
@@ -61,7 +58,7 @@ class CoinAcceptor(private val hal: HAL) {
         }
         hal.setBits(HAL.COIN_EJECT_MASK)
         arr_inserted_coins.map { _ -> 0 }
-
+        totalCoinsInserted = 0
         Thread.sleep(2000)
         hal.clrBits(HAL.COIN_EJECT_MASK)
     }
@@ -70,8 +67,9 @@ class CoinAcceptor(private val hal: HAL) {
         arr_inserted_coins.forEachIndexed { i, element ->
             arr_stored_coins[i] +=element
             arr_inserted_coins[i]  = 0;
-        }
 
+        }
+        totalCoinsInserted =0
         hal.setBits(HAL.COIN_COLLECT_MASK)
         Thread.sleep(2000)
         hal.clrBits(HAL.COIN_COLLECT_MASK)

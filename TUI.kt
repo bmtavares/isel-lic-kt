@@ -8,11 +8,13 @@ const val TIMEOUT_FOR_MAINTENANCE_PROMPT = 5000L
 
 data class Station(val name:String, val price:Int, var counter:Int)
 
-class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD, private val coinacpt: CoinAcceptor){
+class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD, private val coinacpt: CoinAcceptor, private var ticketDispenser: TicketDispenser){
 
     private var usingArrows = false
    private var selection = 0
-
+    private var originstation:Int? = null
+    private var returnTrip = false
+    private var finish = false
    private val listOfStations = readStations()
 
 
@@ -20,9 +22,18 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
    private fun readStations(): List<Station> {
        val lines = File("stations.txt").readLines()
        val result = emptyList<Station>().toMutableList()
+       var cont = 0
        for(line in lines){
            val values = line.split(';')
            result += Station(values[2],values[0].toInt(),0)
+           if(values[0].toInt() == 0){
+               if (originstation != null){
+                   println("more then one oregin station")
+               }
+               originstation =  cont
+
+           }
+           cont += 1
        }
 
        return result
@@ -78,8 +89,9 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
 
    private fun goToStationSelection(){
-       inputSelection('0') //todo
-       while(true){
+       inputSelection('0')
+       finish = false
+       while(!finish){
            when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
               // NONE -> return
                '*' -> alternateSelectionMode()
@@ -191,9 +203,57 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
        selection = newSelect
    }
 
+    private fun refreshPaymentScreen(StationName:String,price: Int){
+        lcd.clear()
+        lcd.write(StationName)
+        lcd.jumpLine()
+        lcd.write(lcd.priceToText(price))
+    }
+
    private fun goToPaymentScreen() {
-       println("TODO")
+       var station = listOfStations.getOrNull(selection)
+       var price = station!!.price!!
+       if(returnTrip) price *=2
+       refreshPaymentScreen(station.name,price)
+       while(!finish){
+
+           if(coinacpt.hasCoin()){
+               coinacpt.acceptCoin()
+               var newprice = price - coinacpt.totalCoinsInserted
+               refreshPaymentScreen(station.name,newprice)
+           }
+
+           if(coinacpt.totalCoinsInserted >= price){
+               print("dispense tiket")
+               lcd.clear()
+               lcd.write("coletc tiket")
+               ticketDispenser.print(selection,originstation!!,returnTrip)
+               coinacpt.collectCoins()
+               finish = true
+
+           }
+/*
+           val key = kbd.getKey()
+           if (key == '0'){
+               alternateTripReturn()
+           }
+           if (key == '#'){
+               goToAbort()
+           }
+*/
+       }
+
    }
+
+    private fun alternateTripReturn(){
+        returnTrip = !returnTrip
+    }
+
+    private fun goToAbort(){
+        finish = true
+        coinacpt.ejectCoins()
+        //TODO
+    }
 
    private fun alternateSelectionMode() {
        usingArrows = !usingArrows
