@@ -255,7 +255,9 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
     private fun goToAbort(){
         finish = true
         coinacpt.ejectCoins()
-        //TODO
+        lcd.clear()
+        lcd.write("Vending Aborted")
+        Thread.sleep(2000)
     }
 
    private fun alternateSelectionMode() {
