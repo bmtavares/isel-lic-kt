@@ -100,30 +100,76 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
 
     private  fun inputSelectionUsingArrows(k:Char){
+        lcd.clear()
         var newSelect = selection
         if(k == '2'){
             newSelect +=1
+            if (newSelect >= listOfStations.size){
+                newSelect = 0
+            }
         }else if (k == '8'){
             newSelect -=1
-
+            if (newSelect <= -1){
+                newSelect = listOfStations.size-1
+            }
         }
+
+
         var station = listOfStations.getOrNull(newSelect)
         lcd.write(station!!.name)
         lcd.jumpLine()
+        if(newSelect<10) lcd.write('0')
         lcd.write(newSelect.toString())
-
+        lcd.write("<>")
         lcd.setDDRAGM(76)
         lcd.write(lcd.priceToText(station!!.price!!))
-        lcd.setDDRAGM(66)
-        lcd.write("<>")
 
         selection = newSelect
 
 
     }
 
-   private fun inputSelection(k:Char) {
+    private  fun inputSelectionUsingArrows(i :Int){
+        lcd.clear()
 
+
+
+
+        var station = listOfStations.getOrNull(i)
+        lcd.write(station!!.name)
+        lcd.jumpLine()
+        if(i<10) lcd.write('0')
+        lcd.write(i.toString())
+        lcd.write("<>")
+        lcd.setDDRAGM(76)
+        lcd.write(lcd.priceToText(station!!.price!!))
+
+        selection = i
+
+
+    }
+
+
+
+    private fun inputSelection(i:Int) {
+        lcd.clear()
+
+        var station = listOfStations.getOrNull(i)
+
+        lcd.write(station!!.name)
+        lcd.jumpLine()
+        if(i<10) lcd.write('0')
+        lcd.write(i.toString())
+
+        lcd.setDDRAGM(76)
+        lcd.write(lcd.priceToText(station!!.price!!))
+        lcd.setDDRAGM(66)
+
+
+        selection = i
+    }
+
+   private fun inputSelection(k:Char) {
        lcd.clear()
        var newSelect = (selection * 10 + (k.toInt()-48)) % 100  // char to digit only implemented on kotlin 15
        var station = listOfStations.getOrNull(newSelect)
@@ -134,6 +180,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
        }
            lcd.write(station!!.name)
            lcd.jumpLine()
+           if(newSelect<10) lcd.write('0')
            lcd.write(newSelect.toString())
 
            lcd.setDDRAGM(76)
@@ -150,5 +197,12 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
    private fun alternateSelectionMode() {
        usingArrows = !usingArrows
+
+       if(usingArrows){
+           return inputSelectionUsingArrows(selection)
+       }
+
+       return inputSelection(selection)
+       //refreshcren
    }
 }

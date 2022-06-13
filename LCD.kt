@@ -58,8 +58,10 @@ class LCD(private val serialEmitter: SerialEmitter){
         var cent = 0
         cent = i % 100
         unidades = (i - cent)/100
+        if( cent < 10) cent *= 10
+        var s = "$unidades.$cent$"
+        if (cent == 0) s = "$unidades.00$"
 
-        val s = "$unidades.$cent$"
         return s
     }
 
