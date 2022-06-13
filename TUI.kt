@@ -105,12 +105,15 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
    private fun shutdown(): Nothing = exitProcess(0)
 
+    private fun timeout(){
+        finish = true
+    }
 
    private fun goToStationSelection(){
        inputSelection('0')
        while(!finish){
            when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
-              // NONE -> return
+               NONE -> timeout()
                '*' -> alternateSelectionMode()
                '#' -> goToPaymentScreen()
               // else -> inputSelection(k)
@@ -142,6 +145,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
             }
         }
         var station = listOfStations.getOrNull(newSelect)
+
         dispaySelection(station,newSelect)
     }
 
@@ -221,10 +225,13 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
            if(coinacpt.totalCoinsInserted >= price){
                print("dispense tiket")
-               lcd.clear()
+               lcd.jumpLine()
                lcd.write("coletc tiket")
                ticketDispenser.print(selection,originstation!!,returnTrip)
                coinacpt.collectCoins()
+               lcd.jumpLine()
+               lcd.write("have a nice trip")
+               Thread.sleep(2000)
                finish = true
 
            }
