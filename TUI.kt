@@ -40,17 +40,23 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
    }
 
    fun waitingScreen(){
-       lcd.write(" Ticket to Ride ")
-       lcd.jumpLine()
-       lcd.write("place holder date ")
+
        while(true){
-           if (m.isMaintenanceKey()){
-               goToMaintenanceMenu()
+           finish = false
+           lcd.clear()
+           lcd.write(" Ticket to Ride ")
+           lcd.jumpLine()
+           lcd.write("place holder date ")
+           while (!finish){
+               if (m.isMaintenanceKey()){
+                   goToMaintenanceMenu()
+               }
+               if(kbd.getKey() == '#'){
+                   initStationSelection()
+                   goToStationSelection()
+               }
            }
-           if(kbd.getKey() == '#'){
-               initStationSelection()
-               goToStationSelection()
-           }
+
        }
    }
 
@@ -90,7 +96,6 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
    private fun goToStationSelection(){
        inputSelection('0')
-       finish = false
        while(!finish){
            when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
               // NONE -> return
@@ -160,8 +165,6 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
 
     private fun inputSelection(i:Int) {
-
-
         var station = listOfStations.getOrNull(i)
 
         dispaySelection(station,i)
