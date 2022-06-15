@@ -1,3 +1,4 @@
+import isel.leic.utils.Time
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,15 +43,17 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
    }
 
    fun waitingScreen(){
-       val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
+   	   val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
+       var write = true
        while(true){
            finish = false
            lcd.clear()
-           lcd.write(" Ticket to Ride ")
+           lcd.writeCentered("Ticket to Ride")
            lcd.jumpLine()
 
            var currentDate = sdf.format(Date())
            lcd.write(currentDate.toString())
+           lcd.home()
            while (!finish){
                if (m.isMaintenanceKey()){
                    goToMaintenanceMenu()
@@ -64,11 +67,11 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
                    lcd.jumpLine()
                    lcd.write(newcurrentDate.toString())
                    currentDate = newcurrentDate
+                   lcd.home()
                }
 
 
            }
-
        }
    }
 
@@ -79,23 +82,31 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
    private fun goToMaintenanceMenu() {
        while(true){
+           lcd.clear()
            lcd.write(Maintenance.LINE_TOP)
+           lcd.cursor(2,1)
            lcd.write(m.getMenuLine()) // LOW
-           when(kbd.waitKey(TIMEOUT_FOR_MAINTENANCE)){
-               NONE -> continue
-             //  '1' -> printTicket()
-            //   '2' -> stationsCount()
-               '3' -> coinacpt.arr_stored_coins.sum()
-               '4' -> resetCountersScreen()
-               '5' -> shutdown()
-           }
+           lcd.home()
+           val start = Time.getTimeInMillis()
+           while(Time.getTimeInMillis() < start + TIMEOUT_FOR_MAINTENANCE){
+               when(kbd.getKey()){
+                   //  '1' -> printTicket()
+                   //  '2' -> stationsCount()
+                   '3' -> coinacpt.arr_stored_coins.sum().toString()
+                   '4' -> resetCountersScreen()
+                   '5' -> shutdownScreen()
+               }
 
-           if(!m.isMaintenanceKey()) break
+               if(!m.isMaintenanceKey()) return
+           }
        }
    }
 
    private fun resetCountersScreen() {
-       lcd.write(" Reset Counters ")
+       lcd.clear()
+       lcd.writeCentered("Reset Counters")
+       lcd.cursor(2, 1)
+       lcd.write("5-Yes  other-No")
        if(kbd.waitKey(TIMEOUT_FOR_MAINTENANCE_PROMPT) == '5') resetCounters()
    }
 
@@ -103,7 +114,13 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
        TODO("Not yet implemented")
    }
 
-   private fun shutdown(): Nothing = exitProcess(0)
+    private fun shutdownScreen() {
+        lcd.clear()
+        lcd.writeCentered("Shutdown")
+        lcd.cursor(2, 1)
+        lcd.write("5-Yes  other-No")
+        if(kbd.waitKey(TIMEOUT_FOR_MAINTENANCE_PROMPT) == '5') exitProcess(0)
+    }
 
     private fun timeout(){
         finish = true
@@ -111,9 +128,10 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
    private fun goToStationSelection(){
        inputSelection('0')
+       finish = false
        while(!finish){
            when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
-               NONE -> timeout()
+               NONE -> return
                '*' -> alternateSelectionMode()
                '#' -> goToPaymentScreen()
               // else -> inputSelection(k)
@@ -132,6 +150,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
 
     private  fun inputSelectionUsingArrows(k:Char){
+        lcd.clear()
         var newSelect = selection
         if(k == '2'){
             newSelect +=1
@@ -145,7 +164,6 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
             }
         }
         var station = listOfStations.getOrNull(newSelect)
-
         dispaySelection(station,newSelect)
     }
 
