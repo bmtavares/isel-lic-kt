@@ -13,13 +13,7 @@ class CoinAcceptor(private val hal: HAL) {
         Thread.sleep(1000)
     }
 
-
-
-    fun hasCoin(): Boolean {
-        var Inat: Int = hal.readBits(HAL.COIN_MASK)
-
-        return Inat != 0
-    }
+    fun hasCoin() = hal.isBit(HAL.COIN_MASK)
 
     fun getCoinValue(): Int {
         val arr = arrayOf<Int>(5, 10, 20,50,100,200)

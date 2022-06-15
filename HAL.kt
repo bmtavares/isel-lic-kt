@@ -4,7 +4,7 @@ class HAL {
     companion object{
         const val SS_MASK = 0b0000_1000
         const val SCLK_MASK = 0b0000_0100
-        const val SDX_MASK = 0b0000_0001
+        const val SDX_MASK = 0b0000_0010
         const val BUSY_BIT = 0b0100_0000
 
         const val COIN_MASK = 0b0000_1000
@@ -37,8 +37,9 @@ class HAL {
      * */
     fun readBits(mask: Int): Int{
         var Inat: Int = UsbPort.read() and mask
-        Inat = UsbPort.read() and mask
-        Inat = UsbPort.read() and mask
+//        Inat = UsbPort.read() and mask
+
+//        Inat = UsbPort.read() and mask
         return Inat
     }
 
