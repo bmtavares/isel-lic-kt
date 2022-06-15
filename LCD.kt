@@ -11,7 +11,7 @@ class LCD(private val serialEmitter: SerialEmitter){
 
     private fun writeCMD(data: Int) = writeByte(false,data)
 
-     fun writeData(data: Int) = writeByte(true,data)
+    fun writeData(data: Int) = writeByte(true,data)
 
     fun init() {
         writeCMD(0b0011_0000)   //Function set
@@ -21,16 +21,18 @@ class LCD(private val serialEmitter: SerialEmitter){
         //n = 1 F = 0
         writeCMD(0b0011_1000)
         writeCMD(0b0000_1000)   //Display off
-        clear()                 //Display clear
-        writeCMD(0b0000_0111)   //Entry mode set testado na aula
-        writeCMD(0b0000_0110)   //Sets cursor move direction   A0 = 0 = no shift ??
+        clear()                     //Display clear
+        writeCMD(0b0000_0110)   //Entry mode set testado na aula
+//        writeCMD(0b0000_0110)   //Sets cursor move direction   A0 = 0 = no shift ??
                                       //and specifies display shift.
                                       //These operations are
                                       //performed during data write
                                       //and read.
 
-        writeCMD(0b0000_1111)   //Display on/off control
+        writeCMD(0b0000_1100)   //Display on/off control
     }
+
+    fun home() = writeCMD(0b11)
 
     fun write(text: String) {
         var i = 0
@@ -41,6 +43,11 @@ class LCD(private val serialEmitter: SerialEmitter){
             }
             i++
         }
+    }
+
+    fun writeCentered(text:String) {
+        val pad = (COLS - text.length) / 2
+        write(text.padStart(pad))
     }
 
     fun write(c: Char) = writeData(c.toInt())
@@ -69,12 +76,31 @@ class LCD(private val serialEmitter: SerialEmitter){
         setDDRAGM(65)
     }
 
-
-
     fun setDDRAGM(i: Int){
         //i must be 0 .. 127
         var il : Int = i + 127
         writeCMD(il)
+    }
+
+    private fun setCGRAM(i:Int){
+        if (i in 0..0x3F){
+            val i = 0x40 + i
+            writeCMD(i)
+        }
+    }
+
+    fun writeCharacterPattern(){
+        setCGRAM(0b0)
+        writeData(0x6)
+        writeData(0x9)
+        writeData(0x1C)
+        writeData(0x8)
+        writeData(0x1C)
+        writeData(0x9)
+        writeData(0x6)
+        writeData(0x0)
+        clear()
+        writeData(0x0)
     }
 
     fun unitTest() {
