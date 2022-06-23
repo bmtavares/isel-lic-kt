@@ -9,7 +9,9 @@ private val serialEmitter = SerialEmitter(hal)
 private val kbd = KBD(hal)
 private val ticketDispenser = TicketDispenser(serialEmitter)
 private val lcd = LCD(serialEmitter)
-private val coinAcceptor = CoinAcceptor(hal)
+private val fs = FileService()
+private val coinAcceptor = CoinAcceptor(hal,fs)
+private val stationService = StationService(fs)
 
 
 
@@ -19,9 +21,9 @@ fun main(args: Array<String>) {
             runTests()
         else {
             lcd.init()
-
+//            lcd.writeCharacterPattern()
             val m = Maintenance(hal);
-            val tui = TUI(lcd,m,kbd,coinAcceptor,ticketDispenser);
+            val tui = TUI(lcd,m,kbd,stationService,coinAcceptor,ticketDispenser);
             tui.waitingScreen()
 
 

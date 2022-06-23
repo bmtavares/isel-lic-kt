@@ -1,5 +1,4 @@
 import isel.leic.utils.Time
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
@@ -9,38 +8,20 @@ const val TIMEOUT_FOR_MAINTENANCE = 1000L
 const val TIMEOUT_FOR_MAINTENANCE_PROMPT = 5000L
 
 
-data class Station(val name:String, val price:Int, var counter:Int)
 
-class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD, private val coinacpt: CoinAcceptor, private var ticketDispenser: TicketDispenser){
+
+class TUI( private val lcd:LCD,
+           private val m:Maintenance,
+           private val kbd:KBD,
+           private val stationService: StationService,
+           private val coinacpt: CoinAcceptor,
+           private val ticketDispenser: TicketDispenser,
+            ){
 
     private var usingArrows = false
-   private var selection = 0
-    private var originstation:Int? = null
+    private var selection = 0
     private var returnTrip = false
     private var finish = false
-   private val listOfStations = readStations()
-
-
-
-   private fun readStations(): List<Station> {
-       val lines = File("stations.txt").readLines()
-       val result = emptyList<Station>().toMutableList()
-       var cont = 0
-       for(line in lines){
-           val values = line.split(';')
-           result += Station(values[2],values[0].toInt(),0)
-           if(values[0].toInt() == 0){
-               if (originstation != null){
-                   println("more then one oregin station")
-               }
-               originstation =  cont
-
-           }
-           cont += 1
-       }
-
-       return result
-   }
 
    fun waitingScreen(){
    	   val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
@@ -92,7 +73,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
                when(kbd.getKey()){
                    //  '1' -> printTicket()
                    //  '2' -> stationsCount()
-                   '3' -> coinacpt.arr_stored_coins.sum().toString()
+                   //  '3' -> coinsCount()
                    '4' -> resetCountersScreen()
                    '5' -> shutdownScreen()
                }
@@ -111,7 +92,8 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
    }
 
    private fun resetCounters() {
-       TODO("Not yet implemented")
+       stationService.resetCounters()
+       coinacpt.resetCounters()
    }
 
     private fun shutdownScreen() {
@@ -119,7 +101,13 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
         lcd.writeCentered("Shutdown")
         lcd.cursor(2, 1)
         lcd.write("5-Yes  other-No")
-        if(kbd.waitKey(TIMEOUT_FOR_MAINTENANCE_PROMPT) == '5') exitProcess(0)
+        if(kbd.waitKey(TIMEOUT_FOR_MAINTENANCE_PROMPT) == '5') shutdownMachine()
+    }
+
+    private fun shutdownMachine() {
+        stationService.writeStations()
+        coinacpt.writeCoins()
+        exitProcess(0)
     }
 
     private fun timeout(){
@@ -154,16 +142,16 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
         var newSelect = selection
         if(k == '2'){
             newSelect +=1
-            if (newSelect >= listOfStations.size){
+            if (newSelect >= stationService.listOfStations.size){
                 newSelect = 0
             }
         }else if (k == '8'){
             newSelect -=1
             if (newSelect <= -1){
-                newSelect = listOfStations.size-1
+                newSelect = stationService.listOfStations.size-1
             }
         }
-        var station = listOfStations.getOrNull(newSelect)
+        var station = stationService.listOfStations.getOrNull(newSelect)
         dispaySelection(station,newSelect)
     }
 
@@ -190,7 +178,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
     private  fun inputSelectionUsingArrows(i :Int){
 
-        var station = listOfStations.getOrNull(i)
+        var station = stationService.listOfStations.getOrNull(i)
         dispaySelection(station,i)
 
 
@@ -199,7 +187,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
 
 
     private fun inputSelection(i:Int) {
-        var station = listOfStations.getOrNull(i)
+        var station = stationService.listOfStations.getOrNull(i)
 
         dispaySelection(station,i)
     }
@@ -207,10 +195,10 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
    private fun inputSelection(k:Char) {
 
        var newSelect = (selection * 10 + (k.toInt()-48)) % 100  // char to digit only implemented on kotlin 15
-       var station = listOfStations.getOrNull(newSelect)
+       var station = stationService.listOfStations.getOrNull(newSelect)
        if(station == null){
            newSelect = (k.toInt()-48)
-           station = listOfStations.getOrNull(newSelect)
+           station = stationService.listOfStations.getOrNull(newSelect)
            if(station == null) newSelect = selection
        }
        dispaySelection(station,newSelect)
@@ -229,7 +217,7 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
     }
 
    private fun goToPaymentScreen() {
-       var station = listOfStations.getOrNull(selection)
+       var station = stationService.listOfStations.getOrNull(selection)
        var price = station!!.price!!
        if(returnTrip) price *=2
        refreshPaymentScreen(station.name,price)
@@ -245,7 +233,8 @@ class TUI( private val lcd:LCD,private val  m:Maintenance, private val  kbd:KBD,
                print("dispense tiket")
                lcd.jumpLine()
                lcd.write("coletc tiket")
-               ticketDispenser.print(selection,originstation!!,returnTrip)
+               ticketDispenser.print(selection,stationService.originStation!!.ID,returnTrip)
+               station.counter++
                coinacpt.collectCoins()
                lcd.jumpLine()
                lcd.write("have a nice trip")
