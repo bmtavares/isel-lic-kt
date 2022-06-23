@@ -71,7 +71,7 @@ class TUI( private val lcd:LCD,
            val start = Time.getTimeInMillis()
            while(Time.getTimeInMillis() < start + TIMEOUT_FOR_MAINTENANCE){
                when(kbd.getKey()){
-                   //  '1' -> printTicket()
+                     '1' -> goToStationSelection(true)
                    //  '2' -> stationsCount()
                    //  '3' -> coinsCount()
                    '4' -> resetCountersScreen()
@@ -82,6 +82,7 @@ class TUI( private val lcd:LCD,
            }
        }
    }
+
 
    private fun resetCountersScreen() {
        lcd.clear()
@@ -114,14 +115,14 @@ class TUI( private val lcd:LCD,
         finish = true
     }
 
-   private fun goToStationSelection(){
+   private fun goToStationSelection(Maintenance:Boolean = false){
        inputSelection('0')
        finish = false
        while(!finish){
            when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
                NONE -> return
                '*' -> alternateSelectionMode()
-               '#' -> goToPaymentScreen()
+               '#' -> goToPaymentScreen(Maintenance)
               // else -> inputSelection(k)
                else -> selectionMode(k)
            }
@@ -216,7 +217,7 @@ class TUI( private val lcd:LCD,
 
     }
 
-   private fun goToPaymentScreen() {
+   private fun goToPaymentScreen(Maintenance:Boolean = false) {
        var station = stationService.listOfStations.getOrNull(selection)
        var price = station!!.price!!
        if(returnTrip) price *=2
@@ -229,13 +230,15 @@ class TUI( private val lcd:LCD,
                refreshPaymentScreen(station.name,newprice)
            }
 
-           if(coinacpt.totalCoinsInserted >= price){
+           if((coinacpt.totalCoinsInserted >= price) or Maintenance){
                print("dispense tiket")
                lcd.jumpLine()
                lcd.write("coletc tiket")
                ticketDispenser.print(selection,stationService.originStation!!.ID,returnTrip)
-               station.counter++
-               coinacpt.collectCoins()
+               if(!Maintenance){
+                   station.counter++
+                   coinacpt.collectCoins()
+               }
                lcd.jumpLine()
                lcd.write("have a nice trip")
                Thread.sleep(2000)
@@ -257,9 +260,7 @@ class TUI( private val lcd:LCD,
            if (key == '#'){
                goToAbort()
            }
-
        }
-
    }
 
     private fun alternateTripReturn(){
@@ -284,4 +285,66 @@ class TUI( private val lcd:LCD,
        return inputSelection(selection)
        //refreshcren
    }
+
+
+
+
+
+
+
+    private  fun refreshSwoStation(station:Station,newSelect: Int){
+        lcd.clear()
+        lcd.write(station!!.name)
+        lcd.jumpLine()
+        if(newSelect<10) lcd.write('0')
+        lcd.write(station.counter.toString())
+
+
+
+
+
+        selection = newSelect
+
+
+    }
+
+
+
+    private fun inputSelectioncount(k:Char) {
+        var newSelect = (selection * 10 + (k.toInt()-48)) % 100  // char to digit only implemented on kotlin 15
+        var station = stationService.listOfStations.getOrNull(newSelect)
+        if(station == null){
+            newSelect = (k.toInt()-48)
+            station = stationService.listOfStations.getOrNull(newSelect)
+            if(station == null) newSelect = selection
+        }
+        refreshSwoStation(station!!,newSelect)
+
+    }
+
+    private fun stationsCount(){
+        finish = false
+        var station = stationService.listOfStations.getOrNull(selection)
+
+        refreshSwoStation(station!!,selection)
+        while(!finish){
+
+            when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
+                NONE -> return
+                '#' -> goToAbort()
+                // else -> inputSelection(k)
+                else -> inputSelectioncount(k)
+            }
+
+            val key = kbd.getKey()
+
+            if (key == '#'){
+                goToAbort()
+            }
+        }
+
+
+    }
+
+
 }
