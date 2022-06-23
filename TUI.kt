@@ -72,7 +72,7 @@ class TUI( private val lcd:LCD,
            while(Time.getTimeInMillis() < start + TIMEOUT_FOR_MAINTENANCE){
                when(kbd.getKey()){
                      '1' -> goToStationSelection(true)
-                   //  '2' -> stationsCount()
+                     '2' -> stationsCount()
                    //  '3' -> coinsCount()
                    '4' -> resetCountersScreen()
                    '5' -> shutdownScreen()
@@ -332,7 +332,7 @@ class TUI( private val lcd:LCD,
             when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
                 NONE -> return
                 '#' -> goToAbort()
-                // else -> inputSelection(k)
+                 '*' -> continue
                 else -> inputSelectioncount(k)
             }
 
@@ -345,6 +345,4 @@ class TUI( private val lcd:LCD,
 
 
     }
-
-
 }
