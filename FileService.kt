@@ -4,6 +4,9 @@ import java.io.FileReader
 import java.io.FileWriter
 
 class FileService {
+    companion object{
+        const val SYMBOLS_FILE = "symbols.txt"
+    }
     fun readFromFile(filename:String) : List<String> {
         val br = BufferedReader(FileReader(filename))
         val lines = mutableListOf<String>()

@@ -19,3 +19,25 @@ fun Int.flip(dimm:Int) : Int {
     }
     return result
 }
+
+fun deserializeSymbols(lines:List<String>): Map<Char,List<Int>>{
+    var result = mutableMapOf<Char,List<Int>>()
+    for(line in lines){
+        line.split(';').let {
+            firstSplit ->
+                var symbol = mutableListOf<Int>()
+                firstSplit[1].split(',').let {
+                    for(bits in it){
+                        symbol.add(bits.toInt(8))
+                    }
+                }
+                result.put(firstSplit[0][0], symbol.toList())
+        }
+    }
+    return result.toMap()
+}
+
+object Symbols{
+    const val ARROW_UP = "↑"
+    const val ARROW_DOWN = "↓"
+}

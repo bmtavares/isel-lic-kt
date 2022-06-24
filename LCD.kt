@@ -1,8 +1,15 @@
 const val LINES = 2
 const val COLS = 16
+const val DOT_HEIGHT = 8
 const val LINE_2_ADDR = 65
+const val START_CGRAM = 0b0
+const val END_CGRAM = 0b11_1111
 
 class LCD(private val serialEmitter: SerialEmitter){
+
+    private val customSymbolMap = mutableMapOf<Char,Int>()
+
+    private var nextCGRAMAddr: Int? = START_CGRAM
 
     private fun writeByte(rs: Boolean, data: Int) {
         val data = if(rs) 0x100 or data.flip(8) else data.flip(8)
@@ -35,22 +42,25 @@ class LCD(private val serialEmitter: SerialEmitter){
     fun home() = writeCMD(0b11)
 
     fun write(text: String) {
-        var i = 0
-        for (element in text) {
-            write(element)
-            if (i >= 15){
-                writeCMD(0b0001_1000)
-            }
-            i++
+        for ((idx,element) in text.withIndex()) {
+            if(element.toInt() in 32..125)
+                writeSingle(element)
+            else if(customSymbolMap.containsKey(element))
+                customSymbolMap[element]?.let { writeSingle(it) }
+            else writeSingle(0xFF)
+
+            if (idx >= 16) writeCMD(0b0001_1000) // Shift
         }
     }
 
+    private fun writeSingle(c: Char) = writeData(c.toInt())
+
+    private fun writeSingle(addr: Int) = writeData(addr)
+
     fun writeCentered(text:String) {
         val pad = (COLS - text.length) / 2
-        write(text.padStart(pad))
+        write(text.padStart(pad+text.length))
     }
-
-    fun write(c: Char) = writeData(c.toInt())
 
     fun cursor(line: Int, column: Int) {
         val lineStart = LINE_2_ADDR * (line - 1)
@@ -91,18 +101,18 @@ class LCD(private val serialEmitter: SerialEmitter){
         }
     }
 
-    fun writeCharacterPattern(){
-        setCGRAM(0b0)
-        writeData(0x6)
-        writeData(0x9)
-        writeData(0x1C)
-        writeData(0x8)
-        writeData(0x1C)
-        writeData(0x9)
-        writeData(0x6)
-        writeData(0x0)
-        clear()
-        writeData(0x0)
+    fun writeCharacterPattern(char: Char, symbol: List<Int>): Boolean{
+        nextCGRAMAddr?.let {
+            setCGRAM(it)
+            for(line in symbol){
+                writeData(if(line in 0x0..0xFF) line else 0x0)
+            }
+            clear()
+            customSymbolMap[char] = it
+            nextCGRAMAddr = if((it + DOT_HEIGHT) > 0xFF) null else it + DOT_HEIGHT
+            return true
+        }
+        return false
     }
 
     fun unitTest() {
