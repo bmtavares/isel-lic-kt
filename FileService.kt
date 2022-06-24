@@ -1,21 +1,22 @@
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.*
 
 class FileService {
     companion object{
         const val SYMBOLS_FILE = "symbols.txt"
     }
     fun readFromFile(filename:String) : List<String> {
-        val br = BufferedReader(FileReader(filename))
         val lines = mutableListOf<String>()
-        for (line in br.lines()){
-            if(line.isNotEmpty()){
-                lines.add(line)
+
+        try{
+            val br = BufferedReader(FileReader(filename))
+            for (line in br.lines()){
+                if (line.isNotEmpty()) lines.add(line)
             }
+            br.close()
         }
-        return lines
+        catch (ex:FileNotFoundException){}
+
+        return lines.toList()
     }
 
     fun writeToFile(filename:String, lines:List<String>) {

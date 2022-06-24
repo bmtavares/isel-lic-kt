@@ -28,7 +28,7 @@ fun deserializeSymbols(lines:List<String>): Map<Char,List<Int>>{
                 var symbol = mutableListOf<Int>()
                 firstSplit[1].split(',').let {
                     for(bits in it){
-                        symbol.add(bits.toInt(8))
+                        symbol.add(bits.toInt(16))
                     }
                 }
                 result.put(firstSplit[0][0], symbol.toList())
