@@ -8,7 +8,6 @@ import kotlin.system.exitProcess
 class TUI( private val lcd:LCD)
 {
 
-
     fun resetCountersScreen() {
        lcd.clear()
        lcd.writeCentered("Reset Counters")
@@ -16,6 +15,19 @@ class TUI( private val lcd:LCD)
        lcd.write("5-Yes  other-No")
    }
 
+    fun waitingScren(currentDate:String){
+        lcd.clear()
+        lcd.writeCentered("Ticket to Ride")
+        lcd.jumpLine()
+        lcd.write(currentDate.toString())
+        lcd.home()
+    }
+
+    fun updsteDate(newDate:String){
+        lcd.jumpLine()
+        lcd.write(newDate)
+        lcd.home()
+    }
 
      fun shutdownScreen() {
         lcd.clear()

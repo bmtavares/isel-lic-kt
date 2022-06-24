@@ -28,14 +28,9 @@ class APP( private val lcd:LCD,
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
         var write = true
         while(true){
-            finish = false
-            lcd.clear()
-            lcd.writeCentered("Ticket to Ride")
-            lcd.jumpLine()
-
             var currentDate = sdf.format(Date())
-            lcd.write(currentDate.toString())
-            lcd.home()
+            tui.waitingScren(currentDate)
+            finish = false
             while (!finish){
                 if (m.isMaintenanceKey()){
                     goToMaintenanceMenu()
@@ -46,10 +41,8 @@ class APP( private val lcd:LCD,
                 }
                 val newcurrentDate = sdf.format(Date())
                 if(newcurrentDate != currentDate ){
-                    lcd.jumpLine()
-                    lcd.write(newcurrentDate.toString())
+                    tui.updsteDate(newcurrentDate)
                     currentDate = newcurrentDate
-                    lcd.home()
                 }
 
 
@@ -244,8 +237,7 @@ class APP( private val lcd:LCD,
     private fun goToAbort(){
         finish = true
         coinacpt.ejectCoins()
-        lcd.clear()
-        lcd.write("Vending Aborted")
+        tui.ShowToAbort()
         Thread.sleep(2000)
     }
 
@@ -294,7 +286,7 @@ class APP( private val lcd:LCD,
 
             when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
                 NONE -> return
-                '#' -> goToAbort()
+                '#' -> continue
                 '*' -> continue
                 else -> inputSelectionCountCoin(k)
             }

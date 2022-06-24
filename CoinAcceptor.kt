@@ -50,10 +50,10 @@ class CoinAcceptor(private val hal: HAL, private val fs:FileService) {
     }
 
     fun ejectCoins() {
-        if(!hasCoin()){
-            print("error")
-            return
-        }
+    //    if(!hasCoin()){
+      //      print("error")
+       //     return
+       // }
         hal.setBits(HAL.COIN_EJECT_MASK)
         arr_inserted_coins.map { _ -> 0 }
         totalCoinsInserted = 0
