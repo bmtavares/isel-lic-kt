@@ -1,59 +1,42 @@
 import isel.leic.UsbPort
+import java.lang.IndexOutOfBoundsException
 
 class CoinAcceptor(private val hal: HAL, private val fs:FileService) {
     companion object{
         const val FILENAME = "CoinDeposit.txt"
     }
 
-    public  var inserted_coin_value : Int = 0;
-    public  var inserted_coins : Int = 0;
-    public  var arr_inserted_coins = arrayOf<Int>(0, 0, 0,0,0,0);
-    public  var stored_coins : Int = 0;
-    public  var arr_stored_coins = arrayOf<Int>(0, 0, 0,0,0,0);
-    public  var totalCoinsInserted = 0
-    public val coinValues = arrayOf<Int>(5, 10, 20,50,100,200)
+    var inserted_coin_value : Int = 0;
+    var inserted_coins : Int = 0;
+    var arr_inserted_coins = arrayOf<Int>(0, 0, 0,0,0,0);
+    var stored_coins : Int = 0;
+    var arr_stored_coins = arrayOf<Int>(0, 0, 0,0,0,0);
+    var totalCoinsInserted = 0
+    val coinValues = arrayOf<Int>(5, 10, 20,50,100,200)
 
     fun init() {
         hal.clrBits(0b1110_0000)
-//        Thread.sleep(1000)
         readCoins()
     }
 
     fun hasCoin() = hal.isBit(HAL.COIN_MASK)
 
-    fun getCoinValue(): Int {
-        //if 110 or 111 error
-        return coinValues[getCoinIndex()]
-    }
+    private fun getCoinValue(): Int = coinValues.getOrNull(getCoinIndex()) ?: 0
 
-    fun getCoinIndex(): Int {
-        var Inat: Int = hal.readBits(HAL.COIN_VALUE_MASK)
+    private fun getCoinIndex(): Int = hal.readBits(HAL.COIN_VALUE_MASK)
 
-        //if 110 or 111 error
-        return Inat
-    }
-
-    fun acceptCoin() {
-//        if(!hasCoin()){
-//            print("error")
-////            return
-//        }
-
+    fun acceptCoin() = try{
         arr_inserted_coins[getCoinIndex()] +=1;
         totalCoinsInserted += getCoinValue()
         hal.setBits(HAL.COIN_ACCEPT_MASK)
 
-        while (hasCoin()){
+        while (hasCoin()){}
 
-        }
         hal.clrBits(HAL.COIN_ACCEPT_MASK)
     }
+    catch(ex:IndexOutOfBoundsException){ }
 
     fun ejectCoins() {
-    //    if(!hasCoin()){
-      //      print("error")
-       //     return
-       // }
         hal.setBits(HAL.COIN_EJECT_MASK)
         arr_inserted_coins.map { _ -> 0 }
         totalCoinsInserted = 0
