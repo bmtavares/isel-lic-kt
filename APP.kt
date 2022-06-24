@@ -53,12 +53,10 @@ class APP( private val lcd:LCD,
     }
 
     private fun goToMaintenanceMenu() {
-        while(true){
-
-
+        while(!finish){
             tui.showMaintenace(Maintenance.LINE_TOP,m.getMenuLine())
             val start = Time.getTimeInMillis()
-            while(Time.getTimeInMillis() < start + TIMEOUT_FOR_MAINTENANCE){
+            while((Time.getTimeInMillis() < start + TIMEOUT_FOR_MAINTENANCE) and !finish){
                 when(kbd.getKey()){
                     '1' -> goToStationSelection(true)
                     '2' -> stationsCount()
@@ -67,7 +65,7 @@ class APP( private val lcd:LCD,
                     '5' -> shutdownScreen()
                 }
 
-                if(!m.isMaintenanceKey()) return
+                if(!m.isMaintenanceKey()) timeout()
             }
         }
     }
@@ -104,7 +102,7 @@ class APP( private val lcd:LCD,
         finish = false
         while(!finish){
             when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
-                NONE -> return
+                NONE -> timeout()
                 '*' -> alternateSelectionMode()
                 '#' -> goToPaymentScreen(Maintenance)
                 // else -> inputSelection(k)
