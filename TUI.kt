@@ -73,7 +73,7 @@ class TUI( private val lcd:LCD,
                when(kbd.getKey()){
                      '1' -> goToStationSelection(true)
                      '2' -> stationsCount()
-                   //  '3' -> coinsCount()
+                     '3' -> coinsCount()
                    '4' -> resetCountersScreen()
                    '5' -> shutdownScreen()
                }
@@ -320,6 +320,48 @@ class TUI( private val lcd:LCD,
         }
         refreshSwoStation(station!!,newSelect)
 
+    }
+
+    private fun coinsCount() {
+        finish = false
+        switchcoins(0)
+
+        while(!finish){
+
+            when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
+                NONE -> return
+                '#' -> goToAbort()
+                '*' -> continue
+                else -> inputSelectionCountCoin(k)
+            }
+
+            val key = kbd.getKey()
+
+            if (key == '#'){
+                goToAbort()
+            }
+        }
+    }
+
+    private fun switchcoins(idx:Int) {
+        lcd.clear()
+        lcd.write(lcd.priceToText(coinacpt.coinValues[idx]))
+        lcd.jumpLine()
+        if(idx<10) lcd.write('0')
+        lcd.write(coinacpt.arr_stored_coins[idx].toString())
+
+        selection = idx
+    }
+
+    private fun inputSelectionCountCoin(k : Char) {
+        var newSelect = (selection * 10 + (k.toInt()-48)) % 100  // char to digit only implemented on kotlin 15
+        var coin = coinacpt.coinValues.getOrNull(newSelect)
+        if(coin == null){
+            newSelect = (k.toInt()-48)
+            coin = coinacpt.coinValues.getOrNull(newSelect)
+            if(coin == null) newSelect = selection
+        }
+        switchcoins(newSelect)
     }
 
     private fun stationsCount(){

@@ -11,7 +11,7 @@ class CoinAcceptor(private val hal: HAL, private val fs:FileService) {
     public  var stored_coins : Int = 0;
     public  var arr_stored_coins = arrayOf<Int>(0, 0, 0,0,0,0);
     public  var totalCoinsInserted = 0
-    private val coinValues = arrayOf<Int>(5, 10, 20,50,100,200)
+    public val coinValues = arrayOf<Int>(5, 10, 20,50,100,200)
 
     fun init() {
         hal.clrBits(0b1110_0000)
@@ -34,10 +34,10 @@ class CoinAcceptor(private val hal: HAL, private val fs:FileService) {
     }
 
     fun acceptCoin() {
-        if(!hasCoin()){
-            print("error")
-            return
-        }
+//        if(!hasCoin()){
+//            print("error")
+////            return
+//        }
 
         arr_inserted_coins[getCoinIndex()] +=1;
         totalCoinsInserted += getCoinValue()
@@ -73,7 +73,7 @@ class CoinAcceptor(private val hal: HAL, private val fs:FileService) {
         hal.clrBits(HAL.COIN_COLLECT_MASK)
     }
 
-    private fun readCoins(){
+    fun readCoins(){
         val coinsFile = fs.readFromFile(FILENAME)
         for (line in coinsFile){
             line.split(';').let{

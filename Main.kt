@@ -23,6 +23,7 @@ fun main(args: Array<String>) {
             lcd.init()
 //            lcd.writeCharacterPattern()
             val m = Maintenance(hal);
+            coinAcceptor.readCoins()
             val tui = TUI(lcd,m,kbd,stationService,coinAcceptor,ticketDispenser);
             tui.waitingScreen()
 
