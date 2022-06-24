@@ -18,13 +18,13 @@ class TUI( private val lcd:LCD)
     fun waitingScren(currentDate:String){
         lcd.clear()
         lcd.writeCentered("Ticket to Ride")
-        lcd.jumpLine()
+        lcd.cursor(2,1)
         lcd.write(currentDate.toString())
         lcd.home()
     }
 
     fun updsteDate(newDate:String){
-        lcd.jumpLine()
+        lcd.cursor(2,1)
         lcd.write(newDate)
         lcd.home()
     }
@@ -37,10 +37,18 @@ class TUI( private val lcd:LCD)
 
     }
 
+    fun showMaintenace(lineTop:String,menuLine:String){
+        lcd.clear()
+        lcd.write(Maintenance.LINE_TOP)
+        lcd.cursor(2,1)
+        lcd.write(menuLine) // LOW
+        lcd.home()
+    }
+
      fun dispaySelection(station:Station?,newSelect:Int,usingArrows:Boolean){
         lcd.clear()
         lcd.write(station!!.name)
-        lcd.jumpLine()
+         lcd.cursor(2,1)
         if(newSelect<10) lcd.write('0')
         lcd.write(newSelect.toString())
         if(usingArrows){
@@ -61,7 +69,7 @@ class TUI( private val lcd:LCD)
      fun refreshPaymentScreen(StationName:String,price: Int,returnTrip:Boolean){
         lcd.clear()
         lcd.write(StationName)
-        lcd.jumpLine()
+         lcd.cursor(2,1)
         lcd.write(lcd.priceToText(price))
         lcd.writeData(126)
         if(returnTrip){
@@ -78,17 +86,21 @@ class TUI( private val lcd:LCD)
       fun refreshSwoStation(station:Station,newSelect: Int){
         lcd.clear()
         lcd.write(station!!.name)
-        lcd.jumpLine()
+          lcd.cursor(2,1)
         if(newSelect<10) lcd.write('0')
         lcd.write(station.counter.toString())
 
     }
+    fun secondLine(msg :String){
+        lcd.cursor(2,1)
 
+        lcd.write(msg)
+    }
 
      fun switchcoins(idx:Int,coi_valu:Int,coinCount:Int) {
         lcd.clear()
         lcd.write(lcd.priceToText(coi_valu))
-        lcd.jumpLine()
+         lcd.cursor(2,1)
         if(idx<10) lcd.write('0')
         lcd.write(coinCount.toString())
 

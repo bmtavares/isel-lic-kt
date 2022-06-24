@@ -57,11 +57,9 @@ class APP( private val lcd:LCD,
 
     private fun goToMaintenanceMenu() {
         while(true){
-            lcd.clear()
-            lcd.write(Maintenance.LINE_TOP)
-            lcd.cursor(2,1)
-            lcd.write(m.getMenuLine()) // LOW
-            lcd.home()
+
+
+            tui.showMaintenace(Maintenance.LINE_TOP,m.getMenuLine())
             val start = Time.getTimeInMillis()
             while(Time.getTimeInMillis() < start + TIMEOUT_FOR_MAINTENANCE){
                 when(kbd.getKey()){
@@ -128,7 +126,7 @@ class APP( private val lcd:LCD,
 
 
     private  fun inputSelectionUsingArrows(k:Char){
-        lcd.clear()
+     //   lcd.clear()
         var newSelect = selection
         if(k == '2'){
             newSelect +=1
@@ -184,6 +182,7 @@ class APP( private val lcd:LCD,
 
     }
 
+
     private fun goToPaymentScreen(Maintenance:Boolean = false) {
         var station = stationService.listOfStations.getOrNull(selection)
         var price = station!!.price!!
@@ -198,17 +197,16 @@ class APP( private val lcd:LCD,
             }
 
             if((coinacpt.totalCoinsInserted >= price) or Maintenance){
-                print("dispense tiket")
-                lcd.jumpLine()
-                lcd.write("coletc tiket")
+
+                tui.secondLine("coletc tiket")
                 ticketDispenser.print(selection,stationService.originStation!!.ID,returnTrip)
+                tui.secondLine("have a nice trip")
+
                 if(!Maintenance){
                     station.counter++
                     coinacpt.collectCoins()
                 }
-                lcd.jumpLine()
-                lcd.write("have a nice trip")
-                Thread.sleep(2000)
+               // Thread.sleep(2000)
                 finish = true
 
             }
@@ -252,15 +250,7 @@ class APP( private val lcd:LCD,
         //refreshcren
     }
 
-
-
-
-
-
-
     private  fun refreshSwoStation(station:Station,newSelect: Int){
-
-
         tui.refreshSwoStation(station,newSelect)
         selection = newSelect
     }
