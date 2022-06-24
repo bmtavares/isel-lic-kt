@@ -46,7 +46,10 @@ class LCD(private val serialEmitter: SerialEmitter){
             if(element.toInt() in 32..125)
                 writeSingle(element)
             else if(customSymbolMap.containsKey(element))
-                customSymbolMap[element]?.let { writeSingle(it) }
+                customSymbolMap[element]?.let { writeSingle(it)
+                println(element.toInt())
+                }
+
             else writeSingle(0xFF)
 
             if (idx >= 16) writeCMD(0b0001_1000) // Shift
@@ -90,7 +93,7 @@ class LCD(private val serialEmitter: SerialEmitter){
                 writeData(if(line in 0x0..0xFF) line else 0x0)
             }
             setDDRAM(0b0)
-            customSymbolMap[char] = it
+            customSymbolMap[char] = it /8
             nextCGRAMAddr = if((it + DOT_HEIGHT) > END_CGRAM-DOT_HEIGHT-1) null else it + DOT_HEIGHT
             return true
         }

@@ -78,6 +78,9 @@ class TUI( private val lcd:LCD)
         lcd.write(station.name)
         lcd.cursor(2,1)
         if(newSelect<10) lcd.write("0")
+        lcd.write(newSelect.toString())
+        lcd.write(":")
+        lcd.cursor(2,10)
         lcd.write(station.counter.toString())
     }
 
@@ -90,7 +93,7 @@ class TUI( private val lcd:LCD)
         lcd.clear()
         lcd.write(priceToText(coi_valu))
          lcd.cursor(2,1)
-        if(idx<10) lcd.write("0")
+      //  if(idx<10) lcd.write("0")
         lcd.write(coinCount.toString())
      }
 

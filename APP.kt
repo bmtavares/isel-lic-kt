@@ -14,7 +14,6 @@ class APP( private val lcd:LCD,
            private val coinacpt: CoinAcceptor,
            private val ticketDispenser: TicketDispenser,
 ){
-
     private var usingArrows = false
     private var selection = 0
     private var returnTrip = false
@@ -203,6 +202,7 @@ class APP( private val lcd:LCD,
                 }
                // Thread.sleep(2000)
                 finish = true
+                return
 
             }
 
@@ -271,7 +271,10 @@ class APP( private val lcd:LCD,
 
             when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
                 NONE -> return
-                '#' -> continue
+                '#' -> {
+                    finish = true
+                    return
+                }
                 '*' -> continue
                 else -> inputSelectionCountCoin(k)
             }
@@ -279,7 +282,9 @@ class APP( private val lcd:LCD,
             val key = kbd.getKey()
 
             if (key == '#'){
-                goToAbort()
+                finish = true
+                return
+               // goToAbort()
             }
         }
     }
@@ -310,7 +315,10 @@ class APP( private val lcd:LCD,
 
             when (val k = kbd.waitKey(TIMEOUT_FOR_SELECTION)){
                 NONE -> return
-                '#' -> goToAbort()
+                '#' -> {
+                    finish = true
+                    return
+                }
                 '*' -> continue
                 else -> inputSelectioncount(k)
             }
@@ -318,7 +326,9 @@ class APP( private val lcd:LCD,
             val key = kbd.getKey()
 
             if (key == '#'){
-                goToAbort()
+                finish = true
+                return
+                //goToAbort()
             }
         }
 
