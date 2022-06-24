@@ -7,9 +7,6 @@ const val TIMEOUT_FOR_SELECTION = 12000L
 const val TIMEOUT_FOR_MAINTENANCE = 1000L
 const val TIMEOUT_FOR_MAINTENANCE_PROMPT = 5000L
 
-
-
-
 class APP( private val lcd:LCD,
            private val m:Maintenance,
            private val kbd:KBD,
@@ -29,7 +26,7 @@ class APP( private val lcd:LCD,
         var write = true
         while(true){
             var currentDate = sdf.format(Date())
-            tui.waitingScren(currentDate)
+            tui.waitingScreen(currentDate)
             finish = false
             while (!finish){
                 if (m.isMaintenanceKey()){

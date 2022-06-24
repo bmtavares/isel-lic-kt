@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
             lcd.init()
             val symbols = deserializeSymbols(fs.readFromFile(FileService.SYMBOLS_FILE))
             if (symbols.isNotEmpty()) for(symbol in symbols) lcd.writeCharacterPattern(symbol.key, symbol.value)
+            lcd.home()
             val m = Maintenance(hal)
             coinAcceptor.readCoins()
             val app = APP(lcd,m,kbd,stationService,coinAcceptor,ticketDispenser)

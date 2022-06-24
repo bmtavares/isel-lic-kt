@@ -70,25 +70,7 @@ class LCD(private val serialEmitter: SerialEmitter){
 
     fun clear() = writeCMD(0b0000_0001)
 
-    fun priceToText(i: Int):String{
-        var unidades = 0
-        var cent = 0
-        cent = i % 100
-        unidades = (i - cent)/100
-        var s_cent = cent.toString()
-        if( cent < 10) s_cent = "0$cent"
-        var s = "$unidades.$s_cent$"
-
-        if (cent == 0) s = "$unidades.00$"
-
-        return s
-    }
-
-    fun jumpLine(){
-        setDDRAGM(65)
-    }
-
-    fun setDDRAGM(i: Int){
+    private fun setDDRAM(i: Int){
         //i must be 0 .. 127
         var il : Int = i + 127
         writeCMD(il)
@@ -107,9 +89,9 @@ class LCD(private val serialEmitter: SerialEmitter){
             for(line in symbol){
                 writeData(if(line in 0x0..0xFF) line else 0x0)
             }
-            clear()
+            setDDRAM(0b0)
             customSymbolMap[char] = it
-            nextCGRAMAddr = if((it + DOT_HEIGHT) > 0xFF) null else it + DOT_HEIGHT
+            nextCGRAMAddr = if((it + DOT_HEIGHT) > END_CGRAM-DOT_HEIGHT-1) null else it + DOT_HEIGHT
             return true
         }
         return false
