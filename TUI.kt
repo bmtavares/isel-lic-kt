@@ -8,6 +8,7 @@ import kotlin.system.exitProcess
 class TUI( private val lcd:LCD)
 {
 
+
     fun resetCountersScreen() {
        lcd.clear()
        lcd.writeCentered("Reset Counters")
